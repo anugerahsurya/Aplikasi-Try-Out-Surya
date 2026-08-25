@@ -60,11 +60,21 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [securityToast, setSecurityToast] = useState<string | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isSubmittingRef = useRef(false);
+  const securityToastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showSecurityToast = useCallback((msg: string) => {
+    if (securityToastTimerRef.current) clearTimeout(securityToastTimerRef.current);
+    setSecurityToast(msg);
+    securityToastTimerRef.current = setTimeout(() => {
+      setSecurityToast(null);
+    }, 2600);
+  }, []);
 
   const currentQuestion = initialData.questions[currentIndex];
   const policy = initialData.security_policy || {
@@ -281,53 +291,162 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     [attemptId, policy, executeSubmit]
   );
 
-  // Anti-Cheating Listeners
+  // Anti-Cheating Listeners (Desktop & Mobile Smartphone)
   useEffect(() => {
+    // Add anti-selection and anti-touch-callout classes to html & body
+    if (policy.disable_clipboard) {
+      document.documentElement.classList.add("quiz-secure-lock");
+      document.body.classList.add("quiz-secure-lock");
+    }
+
+    const isMobileDevice = () =>
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        logSecurityEvent("tab_hidden", { reason: "Pindah tab atau meminimalkan browser" });
+        logSecurityEvent("tab_hidden", {
+          reason: "Pindah tab atau meminimalkan browser",
+          is_mobile: isMobileDevice(),
+        });
         setWarningMessage("Anda terdeteksi meninggalkan halaman ujian (pindah tab atau membuka aplikasi lain).");
       }
     };
 
     const handleWindowBlur = () => {
       if (policy.log_focus_loss) {
-        logSecurityEvent("window_blur", { reason: "Jendela browser kehilangan fokus" });
+        logSecurityEvent("window_blur", {
+          reason: "Jendela browser kehilangan fokus",
+          is_mobile: isMobileDevice(),
+        });
       }
     };
 
     const handleFullscreenChange = () => {
-      const inFullscreen = Boolean(document.fullscreenElement);
+      const inFullscreen = Boolean(
+        document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement
+      );
       setIsFullscreen(inFullscreen);
       if (!inFullscreen && policy.require_fullscreen) {
-        logSecurityEvent("fullscreen_exit", { reason: "Keluar dari mode layar penuh" });
+        logSecurityEvent("fullscreen_exit", {
+          reason: "Keluar dari mode layar penuh",
+          is_mobile: isMobileDevice(),
+        });
         setWarningMessage("Anda keluar dari mode layar penuh. Klik tombol di bawah untuk kembali ke fullscreen.");
       }
     };
 
-    const handleContextMenu = (e: MouseEvent) => {
+    const handleContextMenu = (e: MouseEvent | TouchEvent | Event) => {
       if (policy.disable_clipboard) {
         e.preventDefault();
-        logSecurityEvent("clipboard_attempt", { action: "contextmenu" });
+        showSecurityToast("⚠️ Menu konteks dinonaktifkan demi keamanan ujian.");
+        logSecurityEvent("clipboard_attempt", {
+          action: "contextmenu",
+          is_mobile: isMobileDevice(),
+        });
+      }
+    };
+
+    const handleClipboardAction = (e: ClipboardEvent) => {
+      if (policy.disable_clipboard) {
+        e.preventDefault();
+        showSecurityToast("⚠️ Fitur salin/tempel (copy/paste) dinonaktifkan!");
+        logSecurityEvent("clipboard_attempt", {
+          action: e.type,
+          is_mobile: isMobileDevice(),
+        });
+      }
+    };
+
+    const handleSelectStart = (e: Event) => {
+      if (policy.disable_clipboard) {
+        e.preventDefault();
+      }
+    };
+
+    const handleSelectionChange = () => {
+      if (!policy.disable_clipboard) return;
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+        const text = selection.toString();
+        if (text && text.trim().length > 0) {
+          selection.removeAllRanges();
+          if (typeof (selection as any).empty === "function") {
+            (selection as any).empty();
+          }
+          showSecurityToast("⚠️ Seleksi teks dinonaktifkan!");
+        }
+      }
+    };
+
+    const handleDragStart = (e: DragEvent) => {
+      if (policy.disable_clipboard) {
+        e.preventDefault();
+      }
+    };
+
+    // Mobile touch suppression for long-press selection & magnifier
+    let touchHoldTimer: NodeJS.Timeout | null = null;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!policy.disable_clipboard) return;
+
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed) {
+        sel.removeAllRanges();
+      }
+
+      if (e.touches.length === 1) {
+        if (touchHoldTimer) clearTimeout(touchHoldTimer);
+        touchHoldTimer = setTimeout(() => {
+          const s = window.getSelection();
+          if (s) s.removeAllRanges();
+        }, 350);
+      }
+    };
+
+    const handleTouchMove = () => {
+      if (touchHoldTimer) {
+        clearTimeout(touchHoldTimer);
+        touchHoldTimer = null;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (touchHoldTimer) {
+        clearTimeout(touchHoldTimer);
+        touchHoldTimer = null;
+      }
+      if (!policy.disable_clipboard) return;
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed) {
+        sel.removeAllRanges();
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent common shortcuts: Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+P, Ctrl+U, F12, PrintScreen
+      // Prevent common shortcuts: Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+P, Ctrl+U, Ctrl+S, Ctrl+A, F12, PrintScreen
       if (
         policy.disable_clipboard &&
         (e.ctrlKey || e.metaKey) &&
         ["c", "v", "x", "p", "u", "s", "a"].includes(e.key.toLowerCase())
       ) {
         e.preventDefault();
-        logSecurityEvent("clipboard_attempt", { key: e.key });
+        showSecurityToast("⚠️ Shortcut tombol salin/pilih dinonaktifkan!");
+        logSecurityEvent("clipboard_attempt", { key: e.key, is_mobile: isMobileDevice() });
       }
-      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase()))) {
         e.preventDefault();
-        logSecurityEvent("dev_tools_attempt");
+        showSecurityToast("⚠️ Akses DevTools dilarang.");
+        logSecurityEvent("dev_tools_attempt", { is_mobile: isMobileDevice() });
       }
       if (e.key === "PrintScreen") {
-        logSecurityEvent("print_screen_attempt");
+        showSecurityToast("⚠️ Tangkapan layar dilarang.");
+        logSecurityEvent("print_screen_attempt", { is_mobile: isMobileDevice() });
       }
     };
 
@@ -345,34 +464,95 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
     document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("copy", handleClipboardAction);
+    document.addEventListener("cut", handleClipboardAction);
+    document.addEventListener("paste", handleClipboardAction);
+    document.addEventListener("selectstart", handleSelectStart);
+    document.addEventListener("selectionchange", handleSelectionChange);
+    document.addEventListener("dragstart", handleDragStart);
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
+    document.addEventListener("touchend", handleTouchEnd, { passive: true });
     document.addEventListener("keydown", handleKeyDown);
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
     // Initial fullscreen state check
-    setIsFullscreen(Boolean(document.fullscreenElement));
+    const initialFs = Boolean(
+      document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+    );
+    setIsFullscreen(initialFs);
 
     return () => {
+      document.documentElement.classList.remove("quiz-secure-lock");
+      document.body.classList.remove("quiz-secure-lock");
+      if (touchHoldTimer) clearTimeout(touchHoldTimer);
+      if (securityToastTimerRef.current) clearTimeout(securityToastTimerRef.current);
+
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleWindowBlur);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
       document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("copy", handleClipboardAction);
+      document.removeEventListener("cut", handleClipboardAction);
+      document.removeEventListener("paste", handleClipboardAction);
+      document.removeEventListener("selectstart", handleSelectStart);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+      document.removeEventListener("dragstart", handleDragStart);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
       document.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [policy, logSecurityEvent, flushOutbox]);
+  }, [policy, logSecurityEvent, flushOutbox, showSecurityToast]);
 
   const enterFullscreen = async () => {
     try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
+      const docEl = document.documentElement as any;
+      const isCurrentlyFs = Boolean(
+        document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement
+      );
+
+      if (!isCurrentlyFs) {
+        if (docEl.requestFullscreen) {
+          await docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          await docEl.webkitRequestFullscreen();
+        } else if (docEl.mozRequestFullScreen) {
+          await docEl.mozRequestFullScreen();
+        } else if (docEl.msRequestFullscreen) {
+          await docEl.msRequestFullscreen();
+        }
         setIsFullscreen(true);
         setWarningMessage(null);
+      } else {
+        const doc = document as any;
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
+        } else if (doc.mozCancelFullScreen) {
+          await doc.mozCancelFullScreen();
+        } else if (doc.msExitFullscreen) {
+          await doc.msExitFullscreen();
+        }
+        setIsFullscreen(false);
       }
     } catch (err) {
-      console.warn("Fullscreen request error:", err);
+      console.warn("Fullscreen request error or unsupported:", err);
+      // On iOS Safari where fullscreen API is not supported on iPhone root element, dismiss warning anyway
+      setWarningMessage(null);
     }
   };
 
@@ -399,7 +579,10 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-canvas)" }}>
+    <div
+      className={`quiz-wrapper ${policy.disable_clipboard ? "quiz-secure-lock" : ""}`}
+      style={{ minHeight: "100vh", background: "var(--bg-canvas)" }}
+    >
       {/* Sticky Quiz Header */}
       <header className="quiz-header">
         <div className="quiz-header-inner">
@@ -439,9 +622,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
             {/* Fullscreen Toggle */}
             <button
               onClick={enterFullscreen}
-              className="btn btn-ghost btn-sm desktop-only"
+              className="btn btn-ghost btn-sm"
               style={{ color: "#cbd5e1", padding: 6 }}
-              title="Fullscreen"
+              title={isFullscreen ? "Keluar Fullscreen" : "Masuk Fullscreen"}
             >
               {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             </button>
@@ -786,6 +969,13 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {/* Security Block Toast Notification */}
+      {securityToast && (
+        <div className="quiz-toast-warning">
+          <ShieldAlert size={16} />
+          <span>{securityToast}</span>
         </div>
       )}
     </div>
