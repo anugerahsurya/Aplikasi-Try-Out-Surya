@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { AppRole } from "@/types";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationDropdown } from "@/components/ui/NotificationDropdown";
 import { Logo } from "@/components/ui/logo";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -126,8 +127,9 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
             )}
           </nav>
 
-          {/* User Controls & Theme Toggle */}
+          {/* User Controls, Notifications & Theme Toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            <NotificationDropdown />
             <ThemeToggle />
 
             {userEmail && (
@@ -249,7 +251,8 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
             )}
           </>
         )}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "2px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "2px" }}>
+          <NotificationDropdown />
           <ThemeToggle />
         </div>
       </nav>
