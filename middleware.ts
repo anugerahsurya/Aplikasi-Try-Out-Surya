@@ -36,10 +36,49 @@ export async function middleware(request: NextRequest) {
       }
     );
 
-    // Refresh auth session
-    await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const pathname = request.nextUrl.pathname;
+
+    // RBAC: Protect /admin routes from non-admin participants & guests
+    if (pathname.startsWith("/admin")) {
+      if (!user) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/login";
+        return NextResponse.redirect(url);
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+        // Redirect unauthorized participant to user dashboard
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Protect participant protected routes (/dashboard, /profile, /tryout, /exams)
+    if (
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/tryout") ||
+      pathname.startsWith("/exams")
+    ) {
+      if (!user) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/login";
+        return NextResponse.redirect(url);
+      }
+    }
   } catch (err) {
-    console.error("Middleware auth refresh error:", err);
+    console.error("Middleware auth verification error:", err);
   }
 
   return supabaseResponse;

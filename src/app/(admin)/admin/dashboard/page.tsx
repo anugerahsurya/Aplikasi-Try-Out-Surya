@@ -86,38 +86,6 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* SMTP Status Notice */}
-        <div
-          className="card"
-          style={{
-            padding: "16px 20px",
-            marginBottom: 28,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 12,
-            background: smtpActive ? "var(--brand-light)" : "var(--warning-bg)",
-            borderColor: smtpActive ? "var(--border-color)" : "var(--warning-border)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Mail size={20} color={smtpActive ? "var(--brand-accent)" : "var(--warning)"} />
-            <div>
-              <strong style={{ fontSize: "0.92rem", color: "var(--text-primary)" }}>
-                Status Layanan Email (SMTP Google):
-              </strong>{" "}
-              <span style={{ fontSize: "0.88rem", color: "var(--text-secondary)" }}>
-                {smtpActive
-                  ? `Aktif (${smtpConfig?.host} port ${smtpConfig?.port} via App Password)`
-                  : "Password App terpasang (`ciwh afam oyfq ahpk`). Masukkan `SMTP_USER` di `.env.local` untuk mengaktifkan pengiriman."}
-              </span>
-            </div>
-          </div>
-          <span className={`badge ${smtpActive ? "badge-success" : "badge-warning"}`}>
-            {smtpActive ? "Siap Kirim" : "Perlu SMTP_USER"}
-          </span>
-        </div>
 
         {/* 4 Stat Cards */}
         <div className="grid grid-4" style={{ marginBottom: 32 }}>

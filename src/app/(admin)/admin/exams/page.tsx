@@ -84,14 +84,14 @@ export default async function AdminExamsPage() {
                       {exam.description || "Tidak ada deskripsi."}
                     </p>
 
-                    <div style={{ display: "flex", gap: 12, fontSize: "0.84rem", color: "var(--navy-700)", marginBottom: 16 }}>
+                    <div style={{ display: "flex", gap: 12, fontSize: "0.84rem", color: "var(--text-secondary)", marginBottom: 16 }}>
                       <span><strong>{qCount}</strong> Soal</span>
                       <span>•</span>
                       <span><strong>{aCount}</strong> Peserta Di-assign</span>
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--line-subtle)", paddingTop: 14 }}>
+                  <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border-color)", paddingTop: 14 }}>
                     <Link
                       href={`/admin/exams/${exam.id}/questions`}
                       className="btn btn-primary btn-sm"
