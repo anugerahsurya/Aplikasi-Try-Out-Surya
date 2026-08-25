@@ -453,6 +453,18 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
             </button>
           </div>
         </div>
+
+        {/* Live Answered Questions Progress Bar */}
+        <div style={{ height: 3.5, background: "var(--border-subtle)", width: "100%", overflow: "hidden" }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${(answeredCount / Math.max(1, totalQuestions)) * 100}%`,
+              background: "linear-gradient(90deg, var(--brand-accent) 0%, var(--success) 100%)",
+              transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          />
+        </div>
       </header>
 
       {/* Main Grid: Question Area + Palette Sidebar */}

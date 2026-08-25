@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Suspense } from "react";
+import { TopProgressBar } from "@/components/ui/top-progress-bar";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -38,7 +40,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={jakarta.variable}>{children}</body>
+      <body className={jakarta.variable}>
+        <Suspense fallback={null}>
+          <TopProgressBar />
+        </Suspense>
+        {children}
+      </body>
     </html>
   );
 }

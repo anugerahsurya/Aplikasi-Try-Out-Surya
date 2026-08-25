@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileJson, CheckCircle2, AlertCircle, Loader2, Download, Copy, Check } from "lucide-react";
+import { Upload, FileJson, CheckCircle2, AlertCircle, Loader2, Download, Copy, Check, Sparkles } from "lucide-react";
 
 interface BulkQuestionImporterProps {
   examId: string;
@@ -63,6 +63,8 @@ export function BulkQuestionImporter({ examId }: BulkQuestionImporterProps) {
   const router = useRouter();
   const [jsonText, setJsonText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [progressStatusText, setProgressStatusText] = useState("");
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -103,6 +105,8 @@ export function BulkQuestionImporter({ examId }: BulkQuestionImporterProps) {
     if (!jsonText.trim()) return;
 
     setIsLoading(true);
+    setImportProgress(15);
+    setProgressStatusText("Memeriksa dan memvalidasi struktur format JSON...");
     setStatus(null);
 
     try {
@@ -112,30 +116,49 @@ export function BulkQuestionImporter({ examId }: BulkQuestionImporterProps) {
       } catch (parseErr) {
         setStatus({ type: "error", message: "Format JSON tidak valid. Pastikan struktur kurung dan tanda petik sudah benar." });
         setIsLoading(false);
+        setImportProgress(0);
         return;
       }
+
+      const questionsList = Array.isArray(parsedJson) ? parsedJson : [parsedJson];
+      setImportProgress(40);
+      setProgressStatusText(`Menyiapkan ${questionsList.length} butir soal ke database...`);
+
+      // Progress animation step
+      const progressTimer = setTimeout(() => {
+        setImportProgress(75);
+        setProgressStatusText(`Menyimpan opsi jawaban dan bobot penilaian...`);
+      }, 400);
 
       const res = await fetch("/api/admin/questions/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           exam_id: examId,
-          questions: Array.isArray(parsedJson) ? parsedJson : [parsedJson],
+          questions: questionsList,
         }),
       });
 
+      clearTimeout(progressTimer);
       const data = await res.json();
+
       if (res.ok) {
+        setImportProgress(100);
+        setProgressStatusText("Impor soal selesai 100%!");
         setStatus({ type: "success", message: data.message });
         setJsonText("");
         router.refresh();
       } else {
+        setImportProgress(0);
         setStatus({ type: "error", message: data.error || "Gagal mengimpor butir soal." });
       }
     } catch (err: any) {
+      setImportProgress(0);
       setStatus({ type: "error", message: "Terjadi kesalahan koneksi saat mengimpor soal." });
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 600);
     }
   };
 
@@ -173,6 +196,48 @@ export function BulkQuestionImporter({ examId }: BulkQuestionImporterProps) {
           </button>
         </div>
       </div>
+
+      {/* Real-time Import Progress Bar */}
+      {isLoading && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: "14px 16px",
+            borderRadius: "var(--radius-md)",
+            background: "var(--bg-surface-secondary)",
+            border: "1px solid var(--border-color)",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, fontSize: "0.86rem" }}>
+            <span style={{ fontWeight: 600, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 6 }}>
+              <Loader2 size={15} className="animate-spin" color="var(--brand-accent)" />
+              {progressStatusText}
+            </span>
+            <span style={{ fontWeight: 800, color: "var(--brand-accent)" }}>{importProgress}%</span>
+          </div>
+
+          <div
+            style={{
+              width: "100%",
+              height: 8,
+              borderRadius: 6,
+              background: "var(--border-color)",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${importProgress}%`,
+                height: "100%",
+                background: "linear-gradient(90deg, #2563eb 0%, #38bdf8 100%)",
+                borderRadius: 6,
+                boxShadow: "0 0 10px rgba(37, 99, 235, 0.5)",
+                transition: "width 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {status && (
         <div
