@@ -83,9 +83,9 @@ export function LoginForm() {
 
       <button
         type="submit"
-        className="btn btn-accent btn-lg"
+        className="btn btn-primary btn-lg"
         disabled={pending}
-        style={{ width: "100%", marginTop: 8 }}
+        style={{ width: "100%", marginTop: 4 }}
       >
         {pending ? (
           <>

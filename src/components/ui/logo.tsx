@@ -21,7 +21,7 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
         userSelect: "none",
       }}
     >
-      {/* Bespoke Geometric Brandmark */}
+      {/* Bespoke Geometric Navy Brandmark */}
       <svg
         width={iconDimensions}
         height={iconDimensions}
@@ -31,29 +31,29 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
         style={{ flexShrink: 0 }}
       >
         <defs>
-          <linearGradient id="logoGradPrimary" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#6366f1" />
-            <stop offset="50%" stopColor="#4f46e5" />
-            <stop offset="100%" stopColor="#312e81" />
+          <linearGradient id="logoNavyGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#2563eb" />
+            <stop offset="50%" stopColor="#1e3a8a" />
+            <stop offset="100%" stopColor="#0f172a" />
           </linearGradient>
-          <linearGradient id="logoGradAccent" x1="0" y1="40" x2="40" y2="0" gradientUnits="userSpaceOnUse">
+          <linearGradient id="logoNavyAccent" x1="0" y1="40" x2="40" y2="0" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="100%" stopColor="#818cf8" />
+            <stop offset="100%" stopColor="#60a5fa" />
           </linearGradient>
-          <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#4f46e5" floodOpacity="0.35" />
+          <filter id="logoNavyGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#1e3a8a" floodOpacity="0.4" />
           </filter>
         </defs>
 
-        {/* Outer Rounded Diamond Container */}
+        {/* Outer Rounded Diamond Container in Deep Navy */}
         <rect
           x="3"
           y="3"
           width="34"
           height="34"
           rx="10"
-          fill="url(#logoGradPrimary)"
-          filter="url(#logoGlow)"
+          fill="url(#logoNavyGrad)"
+          filter="url(#logoNavyGlow)"
         />
 
         {/* Inner Subtle Geometric Shield Accent */}
@@ -73,7 +73,7 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
         />
 
         {/* Top-Right Ambient Energy Node */}
-        <circle cx="28" cy="12" r="2.2" fill="url(#logoGradAccent)" />
+        <circle cx="28" cy="12" r="2.2" fill="url(#logoNavyAccent)" />
       </svg>
 
       {/* Brand Typography */}
@@ -85,7 +85,7 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
             letterSpacing: "-0.035em",
             display: "inline-flex",
             alignItems: "center",
-            gap: 4,
+            gap: 5,
             lineHeight: 1,
             color: "var(--text-primary)",
           }}
@@ -93,14 +93,14 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
           <span>Try Out</span>
           <span
             style={{
-              background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+              background: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)",
               color: "#ffffff",
               fontSize: "0.78em",
               padding: "2px 7px",
               borderRadius: "6px",
               fontWeight: 800,
               letterSpacing: "0.02em",
-              boxShadow: "0 2px 8px rgba(79, 70, 229, 0.3)",
+              boxShadow: "0 2px 8px rgba(30, 58, 138, 0.3)",
             }}
           >
             Yuk

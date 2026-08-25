@@ -1,6 +1,6 @@
 /* =========================================================
-   Try Out Yuk — Design System (Non-Royal Blue & Modern Editorial Tone)
-   Curated Indigo, Iris, Violet, Emerald & Obsidian Mesh
+   Try Out Yuk — Pure Navy Design System (Light & Dark Mode)
+   Sophisticated Deep Navy, Ocean Sapphire & Midnight Obsidian
    ========================================================= */
 
 :root {
@@ -9,9 +9,9 @@
   --bg-surface: #ffffff;
   --bg-surface-secondary: #f1f5f9;
   --bg-surface-hover: #f8fafc;
-  --bg-surface-tinted: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(241, 245, 249, 0.6) 100%);
+  --bg-surface-tinted: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(241, 245, 249, 0.6) 100%);
 
-  /* Typography & Colors (Light Mode - Charcoal Slate) */
+  /* Typography & Colors (Light Mode) */
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
@@ -20,16 +20,16 @@
   /* Borders & Lines */
   --border-color: #e2e8f0;
   --border-subtle: #f1f5f9;
-  --border-focus: #6366f1;
+  --border-focus: #2563eb;
 
-  /* Brand Accents (Deep Indigo & Vibrant Iris — Non Royal Blue) */
-  --brand-primary: #4338ca;
-  --brand-hover: #3730a3;
-  --brand-accent: #6366f1;
-  --brand-accent-hover: #4f46e5;
-  --brand-light: #eef2ff;
-  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #312e81 100%);
-  --brand-glow: 0 4px 20px rgba(99, 102, 241, 0.25);
+  /* Brand Accents (Pure Deep Navy & Royal Sapphire) */
+  --brand-primary: #1e3a8a;
+  --brand-hover: #172554;
+  --brand-accent: #2563eb;
+  --brand-accent-hover: #1d4ed8;
+  --brand-light: #eff6ff;
+  --brand-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #0f172a 100%);
+  --brand-glow: 0 4px 20px rgba(37, 99, 235, 0.25);
 
   /* Status Colors */
   --success: #059669;
@@ -48,11 +48,11 @@
   --info-bg: #f0f9ff;
   --info-border: #bae6fd;
 
-  /* Elevation Shadows & Glassmorphism */
-  --card-shadow: 0 10px 30px -5px rgba(30, 27, 75, 0.06), 0 0 1px 1px rgba(30, 27, 75, 0.04);
-  --card-shadow-hover: 0 18px 40px -10px rgba(30, 27, 75, 0.12), 0 0 1px 1px rgba(99, 102, 241, 0.2);
-  --card-shadow-sm: 0 4px 14px -2px rgba(30, 27, 75, 0.04);
-  --button-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
+  /* Elevation Shadows */
+  --card-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 0 1px 1px rgba(15, 23, 42, 0.04);
+  --card-shadow-hover: 0 18px 40px -10px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(37, 99, 235, 0.2);
+  --card-shadow-sm: 0 4px 14px -2px rgba(15, 23, 42, 0.04);
+  --button-shadow: 0 4px 14px rgba(30, 58, 138, 0.28);
 
   /* Compact 80% Scale Tokens */
   --radius-sm: 7px;
@@ -65,11 +65,11 @@
 /* Dark Mode Tokens */
 [data-theme="dark"] {
   /* Canvas & Surfaces (Dark Mode) */
-  --bg-canvas: #090d16;
-  --bg-surface: #101726;
-  --bg-surface-secondary: #172238;
-  --bg-surface-hover: #1e2c47;
-  --bg-surface-tinted: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(16, 23, 38, 0.9) 100%);
+  --bg-canvas: #070e1b;
+  --bg-surface: #0f1a2e;
+  --bg-surface-secondary: #16243d;
+  --bg-surface-hover: #1a2a46;
+  --bg-surface-tinted: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(15, 26, 46, 0.9) 100%);
 
   /* Typography & Colors (Dark Mode) */
   --text-primary: #f8fafc;
@@ -78,18 +78,18 @@
   --text-inverse: #0f172a;
 
   /* Borders & Lines (Dark Mode) */
-  --border-color: #1e2d45;
-  --border-subtle: #141f30;
-  --border-focus: #818cf8;
+  --border-color: #1e2f4c;
+  --border-subtle: #142036;
+  --border-focus: #3b82f6;
 
   /* Brand Accents (Dark Mode) */
-  --brand-primary: #6366f1;
-  --brand-hover: #818cf8;
-  --brand-accent: #818cf8;
-  --brand-accent-hover: #6366f1;
-  --brand-light: rgba(99, 102, 241, 0.16);
-  --brand-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4338ca 100%);
-  --brand-glow: 0 4px 25px rgba(99, 102, 241, 0.4);
+  --brand-primary: #3b82f6;
+  --brand-hover: #60a5fa;
+  --brand-accent: #3b82f6;
+  --brand-accent-hover: #2563eb;
+  --brand-light: rgba(59, 130, 246, 0.15);
+  --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e3a8a 100%);
+  --brand-glow: 0 4px 25px rgba(59, 130, 246, 0.4);
 
   /* Status Colors (Dark Mode) */
   --success: #34d399;
@@ -110,9 +110,9 @@
 
   /* Elevation Shadows (Dark Mode) */
   --card-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  --card-shadow-hover: 0 24px 56px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(129, 140, 248, 0.35);
+  --card-shadow-hover: 0 24px 56px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(59, 130, 246, 0.35);
   --card-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.4);
-  --button-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+  --button-shadow: 0 4px 18px rgba(59, 130, 246, 0.35);
 }
 
 /* =========================================================
@@ -127,17 +127,17 @@
 html {
   background-color: var(--bg-canvas);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.04) 0px, transparent 50%);
   color: var(--text-primary);
-  font-size: 13.5px; /* Compact 80% view scale */
+  font-size: 13.5px;
   transition: background-color 0.25s ease, color 0.25s ease;
   -webkit-font-smoothing: antialiased;
 }
 
 [data-theme="dark"] html {
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
 }
 
@@ -224,50 +224,40 @@ h4 { font-size: 0.95rem; font-weight: 700; }
 }
 
 .card-navy {
-  background: linear-gradient(145deg, #1e1b4b 0%, #0f172a 100%);
+  background: linear-gradient(145deg, #0b1f3a 0%, #061325 100%);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 16px 36px rgba(6, 19, 37, 0.35);
 }
 
 .card-navy h1, .card-navy h2, .card-navy h3, .card-navy h4, .card-navy .text-white {
   color: #ffffff;
 }
 
-/* Tinted feature card inspired by mobile screenshot 2 */
-.card-tinted-violet {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.07) 0%, rgba(241, 245, 249, 0.5) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.18);
+/* Tinted feature cards */
+.card-tinted-navy {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(241, 245, 249, 0.5) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.18);
 }
 
 .card-tinted-emerald {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.07) 0%, rgba(241, 245, 249, 0.5) 100%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(241, 245, 249, 0.5) 100%);
   border: 1px solid rgba(16, 185, 129, 0.18);
 }
 
-.card-tinted-amber {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.07) 0%, rgba(241, 245, 249, 0.5) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.18);
-}
-
-[data-theme="dark"] .card-tinted-violet {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(16, 23, 38, 0.8) 100%);
-  border-color: rgba(99, 102, 241, 0.25);
+[data-theme="dark"] .card-tinted-navy {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 26, 46, 0.8) 100%);
+  border-color: rgba(37, 99, 235, 0.25);
 }
 
 [data-theme="dark"] .card-tinted-emerald {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 23, 38, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 26, 46, 0.8) 100%);
   border-color: rgba(16, 185, 129, 0.25);
 }
 
-[data-theme="dark"] .card-tinted-amber {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(16, 23, 38, 0.8) 100%);
-  border-color: rgba(245, 158, 11, 0.25);
-}
-
 /* =========================================================
-   Buttons (Refined & Vibrant)
+   Buttons (Navy & Accents)
    ========================================================= */
 .btn {
   display: inline-flex;
@@ -302,9 +292,9 @@ h4 { font-size: 0.95rem; font-weight: 700; }
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 .btn-accent:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -327,7 +317,7 @@ h4 { font-size: 0.95rem; font-weight: 700; }
   color: var(--brand-accent);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(37, 99, 235, 0.2);
 }
 
 .btn-ghost {
@@ -433,7 +423,7 @@ h4 { font-size: 0.95rem; font-weight: 700; }
 .field:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 2.5px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 2.5px rgba(37, 99, 235, 0.2);
 }
 
 .field::placeholder {
@@ -510,7 +500,7 @@ textarea.field {
 }
 
 /* =========================================================
-   Floating Bottom Navigation (Mobile - Picture 2 Style)
+   Floating Bottom Navigation (Mobile)
    ========================================================= */
 .bottom-nav {
   display: none;
@@ -546,14 +536,14 @@ textarea.field {
 .bottom-nav a.active, .bottom-nav a:hover {
   color: #ffffff;
   background: var(--brand-gradient);
-  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
 }
 
 .bottom-nav svg {
   margin-bottom: 2px;
 }
 
-/* Tables (Compact) */
+/* Tables */
 .table-container {
   overflow-x: auto;
   border-radius: var(--radius-md);
@@ -614,7 +604,7 @@ textarea.field {
 }
 
 /* =========================================================
-   Figma-Style 2-Column Split Login Card (Deep Iris Aurora)
+   Figma-Style 2-Column Split Login Card (Deep Navy Aurora)
    ========================================================= */
 .login-page-container {
   min-height: 100vh;
@@ -641,9 +631,9 @@ textarea.field {
   position: relative;
 }
 
-/* Left Visual Banner with Deep Indigo Aurora */
+/* Left Visual Banner with Deep Navy Aurora */
 .login-left-banner {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4338ca 70%, #1e1b4b 100%);
+  background: linear-gradient(135deg, #07152b 0%, #0f2b5c 40%, #1e3a8a 70%, #07152b 100%);
   border-radius: calc(var(--radius-xl) - 4px);
   padding: 30px 26px;
   display: flex;
@@ -662,7 +652,7 @@ textarea.field {
   right: -20%;
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, rgba(99, 102, 241, 0.2) 60%, transparent 80%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(30, 58, 138, 0.2) 60%, transparent 80%);
   filter: blur(35px);
   pointer-events: none;
 }
@@ -674,7 +664,7 @@ textarea.field {
   left: -15%;
   width: 240px;
   height: 240px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.45) 0%, rgba(49, 46, 129, 0.2) 60%, transparent 80%);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.45) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 80%);
   filter: blur(35px);
   pointer-events: none;
 }

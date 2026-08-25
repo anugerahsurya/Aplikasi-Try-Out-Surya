@@ -20,25 +20,34 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
     return { error: parsed.error.issues[0].message };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
-
-  if (error) {
-    return { error: "Email atau password yang Anda masukkan salah." };
-  }
-
-  // Check role to redirect appropriately
   let targetPath = "/dashboard";
-  if (data.user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", data.user.id)
-      .single();
 
-    if (profile && (profile.role === "admin" || profile.role === "super_admin")) {
-      targetPath = "/admin/dashboard";
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+
+    if (error) {
+      return { error: error.message || "Email atau password yang Anda masukkan salah." };
     }
+
+    if (data?.user) {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+        if (profile && (profile.role === "admin" || profile.role === "super_admin")) {
+          targetPath = "/admin/dashboard";
+        }
+      } catch (profileErr) {
+        console.warn("Profile role check skipped:", profileErr);
+      }
+    }
+  } catch (err: any) {
+    console.error("Login action exception:", err);
+    return { error: "Terjadi kesalahan sistem saat memproses login. Silakan coba lagi." };
   }
 
   redirect(targetPath);
