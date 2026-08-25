@@ -33,43 +33,39 @@ export default async function ParticipantDashboard() {
     .from("profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
-
-  // If user is admin, redirect to admin dashboard
-  if (profile?.role === "admin" || profile?.role === "super_admin") {
-    redirect("/admin/dashboard");
-  }
-
-  // Fetch active attempts
-  const { data: activeAttempt } = await supabase
-    .from("exam_attempts")
-    .select("*, exam:exams(*)")
-    .eq("user_id", user.id)
-    .eq("status", "in_progress")
-    .order("started_at", { ascending: false })
-    .limit(1)
     .maybeSingle();
 
-  // Fetch assigned exams
-  const { data: assignments } = await supabase
-    .from("exam_assignments")
-    .select("*, exam:exams(*)")
-    .eq("user_id", user.id);
-
-  // Fetch all published exams (or assigned)
-  const { data: publishedExams } = await supabase
-    .from("exams")
-    .select("*")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
-
-  // Fetch completed attempts for history
-  const { data: completedAttempts } = await supabase
-    .from("exam_attempts")
-    .select("*, exam:exams(*)")
-    .eq("user_id", user.id)
-    .in("status", ["submitted", "expired"])
-    .order("submitted_at", { ascending: false });
+  // Parallel data fetching
+  const [
+    { data: activeAttempt },
+    { data: assignments },
+    { data: publishedExams },
+    { data: completedAttempts },
+  ] = await Promise.all([
+    supabase
+      .from("attempts")
+      .select("*, exam:exams(*)")
+      .eq("user_id", user.id)
+      .eq("status", "in_progress")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("exam_assignments")
+      .select("*, exam:exams(*)")
+      .eq("user_id", user.id),
+    supabase
+      .from("exams")
+      .select("*")
+      .eq("status", "published")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("attempts")
+      .select("*, exam:exams(*)")
+      .eq("user_id", user.id)
+      .in("status", ["submitted", "expired"])
+      .order("submitted_at", { ascending: false }),
+  ]);
 
   const assignedExams =
     assignments && assignments.length > 0

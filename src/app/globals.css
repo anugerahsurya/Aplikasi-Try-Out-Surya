@@ -62,6 +62,24 @@
   --radius-pill: 9999px;
 }
 
+/* Shimmer Skeleton Loaders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-secondary) 0%,
+    var(--border-color) 50%,
+    var(--bg-surface-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Dark Mode Tokens */
 [data-theme="dark"] {
   /* Canvas & Surfaces (Dark Mode) */

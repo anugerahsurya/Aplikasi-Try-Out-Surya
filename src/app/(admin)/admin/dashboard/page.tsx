@@ -18,32 +18,27 @@ import { isSmtpConfigured, getSmtpConfig } from "@/lib/email/email-service";
 export default async function AdminDashboard() {
   const { supabase, user, profile } = await requireAdmin();
 
-  // Metrics
-  const { count: examCount } = await supabase
-    .from("exams")
-    .select("*", { count: "exact", head: true });
-
-  const { count: participantCount } = await supabase
-    .from("profiles")
-    .select("*", { count: "exact", head: true })
-    .eq("role", "participant");
-
-  const { count: activeAttemptCount } = await supabase
-    .from("attempts")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "in_progress");
-
-  const { count: violationCount } = await supabase
-    .from("attempt_events")
-    .select("*", { count: "exact", head: true })
-    .in("event_type", ["tab_hidden", "fullscreen_exit", "window_blur", "clipboard_attempt"]);
-
-  // Recent attempts
-  const { data: recentAttempts } = await supabase
-    .from("attempts")
-    .select("*, exam:exams(title), profile:profiles(full_name, email)")
-    .order("created_at", { ascending: false })
-    .limit(8);
+  // Parallel Metrics & Recent Attempts Fetching
+  const [
+    { count: examCount },
+    { count: participantCount },
+    { count: activeAttemptCount },
+    { count: violationCount },
+    { data: recentAttempts },
+  ] = await Promise.all([
+    supabase.from("exams").select("*", { count: "exact", head: true }),
+    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "participant"),
+    supabase.from("attempts").select("*", { count: "exact", head: true }).eq("status", "in_progress"),
+    supabase
+      .from("attempt_events")
+      .select("*", { count: "exact", head: true })
+      .in("event_type", ["tab_hidden", "fullscreen_exit", "window_blur", "clipboard_attempt"]),
+    supabase
+      .from("attempts")
+      .select("*, exam:exams(title), profile:profiles(full_name, email)")
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
 
   const smtpConfig = getSmtpConfig();
   const smtpActive = isSmtpConfigured();
