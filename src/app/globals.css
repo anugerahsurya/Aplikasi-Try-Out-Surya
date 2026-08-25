@@ -628,7 +628,58 @@ textarea.field {
   background: var(--bg-surface-hover);
 }
 
-/* Stat Cards */
+/* Stat Cards (Crafted & Tactile) */
+.stat-card-crafted {
+  padding: 20px 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.04), 0 0 1px 1px rgba(15, 23, 42, 0.02);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.stat-card-crafted:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.09), 0 0 0 1px var(--border-focus);
+}
+
+.stat-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.stat-card-crafted:hover .stat-icon-box {
+  transform: scale(1.08);
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseBeacon 1.8s infinite;
+}
+
+@keyframes pulseBeacon {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
 .stat-card {
   padding: 18px 20px;
   background: var(--bg-surface);
@@ -644,11 +695,12 @@ textarea.field {
 }
 
 .stat-card-number {
-  font-size: 1.8rem;
+  font-size: 2.1rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin-top: 6px;
-  letter-spacing: -0.03em;
+  margin: 6px 0 2px;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
 }
 
 /* =========================================================

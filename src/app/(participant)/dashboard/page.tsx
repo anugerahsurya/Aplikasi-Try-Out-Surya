@@ -82,15 +82,15 @@ export default async function ParticipantDashboard() {
       userName={profile?.full_name || ""}
       userRole={profile?.role || "participant"}
     >
-      <div>
-        {/* Welcome Banner with Rich Soft Indigo Gradient (Inspired by Image 2) */}
+      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+        {/* Warm Greeting Hero with Dynamic Gradient Mesh */}
         <section
-          className="card"
+          className="stat-card-crafted"
           style={{
             padding: "24px 22px",
             marginBottom: 24,
-            background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(56, 189, 248, 0.06) 50%, var(--bg-surface) 100%)",
-            border: "1px solid rgba(99, 102, 241, 0.18)",
+            background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.05) 50%, var(--bg-surface) 100%)",
+            border: "1px solid rgba(37, 99, 235, 0.18)",
             position: "relative",
             overflow: "hidden",
           }}
@@ -110,7 +110,7 @@ export default async function ParticipantDashboard() {
               </p>
             </div>
 
-            {/* Quick Readiness Widget (Ref Image 2 Passing Probability) */}
+            {/* Quick Readiness Widget */}
             <div
               style={{
                 display: "flex",
@@ -171,7 +171,7 @@ export default async function ParticipantDashboard() {
                     width: 38,
                     height: 38,
                     borderRadius: 10,
-                    background: "rgba(99, 102, 241, 0.12)",
+                    background: "rgba(37, 99, 235, 0.12)",
                     color: "var(--brand-accent)",
                     display: "flex",
                     alignItems: "center",
@@ -196,7 +196,7 @@ export default async function ParticipantDashboard() {
         {/* Active Attempt Banner (If currently taking an exam) */}
         {activeAttempt && (
           <section
-            className="card card-hover"
+            className="stat-card-crafted"
             style={{
               padding: "18px 20px",
               marginBottom: 26,
@@ -227,7 +227,7 @@ export default async function ParticipantDashboard() {
               </div>
               <Link
                 href={`/tryout/${activeAttempt.id}`}
-                className="btn btn-accent btn-lg"
+                className="btn btn-primary btn-lg"
                 style={{ fontWeight: 700 }}
               >
                 Lanjutkan Pengerjaan <ArrowRight size={16} />
@@ -236,7 +236,7 @@ export default async function ParticipantDashboard() {
           </section>
         )}
 
-        {/* Practice Topics / Assigned Exams List (Ref Image 2 Topics Grid) */}
+        {/* Practice Topics / Assigned Exams List */}
         <section style={{ marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
@@ -254,7 +254,7 @@ export default async function ParticipantDashboard() {
               style={{
                 padding: "36px 20px",
                 textAlign: "center",
-                color: "var(--muted)",
+                color: "var(--text-muted)",
                 background: "var(--bg-surface-secondary)",
               }}
             >
@@ -268,12 +268,12 @@ export default async function ParticipantDashboard() {
             <div className="grid grid-2">
               {assignedExams.map((exam, idx) => {
                 const isAttempted = completedAttempts?.some((a: any) => a.exam_id === exam.id);
-                const isVioletTint = idx % 2 === 0;
+                const isNavyTint = idx % 2 === 0;
 
                 return (
                   <div
                     key={exam.id}
-                    className={`card card-hover ${isVioletTint ? "card-tinted-violet" : "card-tinted-emerald"}`}
+                    className={`stat-card-crafted ${isNavyTint ? "card-tinted-navy" : "card-tinted-emerald"}`}
                     style={{
                       padding: "20px 20px",
                       display: "flex",
@@ -301,19 +301,13 @@ export default async function ParticipantDashboard() {
 
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                         <div
+                          className="stat-icon-box"
                           style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 12,
-                            background: isVioletTint ? "rgba(99, 102, 241, 0.14)" : "rgba(16, 185, 129, 0.14)",
-                            color: isVioletTint ? "var(--brand-accent)" : "var(--success)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
+                            background: isNavyTint ? "rgba(37, 99, 235, 0.12)" : "rgba(16, 185, 129, 0.12)",
+                            color: isNavyTint ? "var(--brand-accent)" : "var(--success)",
                           }}
                         >
-                          <BookOpen size={20} />
+                          <BookOpen size={18} />
                         </div>
 
                         <div>
@@ -348,7 +342,7 @@ export default async function ParticipantDashboard() {
                         className="btn btn-primary btn-sm"
                         style={{ padding: "6px 14px" }}
                       >
-                        <Play size={14} /> {isAttempted ? "Ulangi / Detail" : "Mulai Ujian"}
+                        <Play size={13} /> Mulai Simulasi
                       </Link>
                     </div>
                   </div>
@@ -358,71 +352,70 @@ export default async function ParticipantDashboard() {
           )}
         </section>
 
-        {/* Completed Exam History */}
+        {/* History / Completed Attempts Section */}
         {completedAttempts && completedAttempts.length > 0 && (
-          <section>
-            <div style={{ marginBottom: 14 }}>
-              <h2 style={{ fontSize: "1.25rem" }}>Riwayat & Hasil Pengerjaan</h2>
-              <p className="muted" style={{ fontSize: "0.86rem", margin: 0 }}>
-                Arsip skor dan rincian evaluasi jawaban Anda
-              </p>
+          <section className="card" style={{ padding: "20px 22px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <h3 style={{ fontSize: "1.12rem", margin: 0 }}>Riwayat Simulasi Terakhir</h3>
+              <span className="badge badge-neutral">{completedAttempts.length} Riwayat</span>
             </div>
 
-            <div className="table-container">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Judul Ujian</th>
-                    <th>Waktu Selesai</th>
-                    <th>Status</th>
-                    <th>Skor Perolehan</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {completedAttempts.map((attempt: any) => {
-                    const exam = attempt.exam;
-                    const isReleased =
-                      !exam?.result_release_at || new Date(exam.result_release_at) <= new Date();
+            <div style={{ display: "grid", gap: 10 }}>
+              {completedAttempts.map((att: any) => (
+                <div
+                  key={att.id}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "var(--radius-md)",
+                    background: "var(--bg-surface-secondary)",
+                    border: "1px solid var(--border-color)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 10,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "var(--radius-pill)",
+                        background: "var(--success-bg)",
+                        color: "var(--success)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Award size={18} />
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: "0.92rem", display: "block" }}>
+                        {att.exam?.title || "Ujian"}
+                      </strong>
+                      <span className="muted" style={{ fontSize: "0.78rem" }}>
+                        Selesai pada: {new Date(att.submitted_at).toLocaleDateString("id-ID", { dateStyle: "medium" })}
+                      </span>
+                    </div>
+                  </div>
 
-                    return (
-                      <tr key={attempt.id}>
-                        <td style={{ fontWeight: 700 }}>{exam?.title || "Ujian"}</td>
-                        <td className="muted">
-                          {attempt.submitted_at
-                            ? new Date(attempt.submitted_at).toLocaleString("id-ID", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })
-                            : "-"}
-                        </td>
-                        <td>
-                          <span className="badge badge-success">
-                            <CheckCircle2 size={12} /> Selesai
-                          </span>
-                        </td>
-                        <td>
-                          {isReleased ? (
-                            <strong style={{ color: "var(--text-primary)", fontSize: "1rem" }}>
-                              {attempt.score ?? "-"}
-                            </strong>
-                          ) : (
-                            <span className="badge badge-neutral">Menunggu Rilis</span>
-                          )}
-                        </td>
-                        <td>
-                          <Link
-                            href={`/results/${attempt.id}`}
-                            className="btn btn-outline btn-sm"
-                          >
-                            <Award size={13} /> Lihat Hasil
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ textAlign: "right" }}>
+                      <span className="muted" style={{ fontSize: "0.74rem", display: "block" }}>Skor Anda</span>
+                      <strong style={{ fontSize: "1.15rem", color: "var(--text-primary)" }}>{att.score ?? "—"}</strong>
+                    </div>
+
+                    <Link
+                      href={`/results/${att.id}`}
+                      className="btn btn-outline btn-sm"
+                    >
+                      Lihat Hasil & Analisis <ArrowRight size={13} />
+                    </Link>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}
