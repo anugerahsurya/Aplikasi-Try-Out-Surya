@@ -399,12 +399,12 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--canvas)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg-canvas)" }}>
       {/* Sticky Quiz Header */}
       <header className="quiz-header">
         <div className="quiz-header-inner">
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <h2 style={{ color: "#ffffff", fontSize: "1.1rem", margin: 0, fontWeight: 700 }}>
+            <h2 style={{ fontSize: "1.08rem", margin: 0, fontWeight: 700 }}>
               {initialData.title}
             </h2>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -467,13 +467,13 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: 20,
-                  paddingBottom: 16,
-                  borderBottom: "1px solid var(--line)",
+                  marginBottom: 18,
+                  paddingBottom: 14,
+                  borderBottom: "1px solid var(--border-color)",
                 }}
               >
                 <div>
-                  <span className="eyebrow" style={{ color: "var(--navy-600)" }}>
+                  <span className="eyebrow">
                     Soal Nomor {currentIndex + 1} dari {totalQuestions}
                   </span>
                 </div>
@@ -487,7 +487,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                     }`}
                     style={{
                       color: answers[currentQuestion.id]?.isFlagged ? "#b45309" : "inherit",
-                      borderColor: answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "var(--line)",
+                      borderColor: answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "var(--border-color)",
                     }}
                   >
                     <Flag size={14} fill={answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "none"} />
@@ -499,7 +499,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                       onClick={handleClearAnswer}
                       className="btn btn-ghost btn-sm"
                       title="Hapus pilihan"
-                      style={{ color: "var(--muted)" }}
+                      style={{ color: "var(--text-muted)" }}
                     >
                       <RotateCcw size={14} /> Hapus Jawaban
                     </button>
@@ -510,17 +510,17 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               {/* Stem (Question Content) */}
               <div
                 style={{
-                  fontSize: "1.05rem",
+                  fontSize: "1rem",
                   lineHeight: 1.7,
-                  color: "var(--ink)",
-                  marginBottom: 24,
+                  color: "var(--text-primary)",
+                  marginBottom: 22,
                 }}
               >
                 {currentQuestion.stem}
               </div>
 
               {/* Options List (A - E) */}
-              <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "grid", gap: 10 }}>
                 {currentQuestion.options.map((opt) => {
                   const isSelected =
                     answers[currentQuestion.id]?.selectedOptionId === opt.id;
@@ -532,7 +532,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                       className={`option-item ${isSelected ? "selected" : ""}`}
                     >
                       <span className="option-letter">{opt.label}</span>
-                      <span style={{ fontSize: "0.96rem", lineHeight: 1.5, paddingTop: 4 }}>
+                      <span style={{ fontSize: "0.94rem", lineHeight: 1.5, paddingTop: 3 }}>
                         {opt.content}
                       </span>
                     </div>
@@ -546,9 +546,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginTop: 32,
-                  paddingTop: 20,
-                  borderTop: "1px solid var(--line-subtle)",
+                  marginTop: 28,
+                  paddingTop: 16,
+                  borderTop: "1px solid var(--border-subtle)",
                 }}
               >
                 <button
@@ -585,7 +585,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
 
         {/* Right: Question Palette Grid */}
         <div>
-          <div className="card" style={{ padding: 22, position: "sticky", top: 80 }}>
+          <div className="card" style={{ padding: 20, position: "sticky", top: 80 }}>
             <h3 style={{ fontSize: "1.05rem", marginBottom: 14 }}>Daftar Nomor Soal</h3>
 
             {/* Summary Counters */}
@@ -596,7 +596,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 gap: 8,
                 marginBottom: 16,
                 padding: "10px 12px",
-                background: "var(--navy-50)",
+                background: "var(--bg-surface-secondary)",
                 borderRadius: "var(--radius-sm)",
                 textAlign: "center",
                 fontSize: "0.78rem",
@@ -604,7 +604,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               }}
             >
               <div>
-                <span style={{ color: "var(--navy-900)", display: "block", fontSize: "1.1rem" }}>
+                <span style={{ color: "var(--text-primary)", display: "block", fontSize: "1.1rem" }}>
                   {answeredCount}
                 </span>
                 <span className="muted">Dijawab</span>
@@ -616,7 +616,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 <span className="muted">Ragu-ragu</span>
               </div>
               <div>
-                <span style={{ color: "var(--muted)", display: "block", fontSize: "1.1rem" }}>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "1.1rem" }}>
                   {unansweredCount}
                 </span>
                 <span className="muted">Kosong</span>
@@ -649,7 +649,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               })}
             </div>
 
-            <div style={{ marginTop: 24 }}>
+            <div style={{ marginTop: 20 }}>
               <button
                 onClick={() => setShowSubmitModal(true)}
                 className="btn btn-primary btn-lg"
@@ -667,16 +667,16 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header" style={{ background: "var(--danger-bg)" }}>
-              <h3 style={{ color: "var(--danger)", display: "flex", alignItems: "center", gap: 8 }}>
-                <ShieldAlert size={22} /> Peringatan Keamanan
+              <h3 style={{ color: "var(--danger)", display: "flex", alignItems: "center", gap: 8, margin: 0, fontSize: "1.08rem" }}>
+                <ShieldAlert size={20} /> Peringatan Keamanan
               </h3>
             </div>
             <div className="modal-body">
-              <p style={{ fontSize: "0.95rem", color: "var(--ink)", lineHeight: 1.6 }}>
+              <p style={{ fontSize: "0.92rem", color: "var(--text-primary)", lineHeight: 1.6, margin: 0 }}>
                 {warningMessage}
               </p>
-              <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 12 }}>
-                Jumlah rekaman pelanggaran keamanan Anda: <strong>{violationCount}</strong>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: 10 }}>
+                Jumlah rekaman pelanggaran keamanan: <strong>{violationCount}</strong>
                 {policy.auto_submit_after_violations > 0 && (
                   <span> / Maksimal {policy.auto_submit_after_violations} kali</span>
                 )}
@@ -699,21 +699,22 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3 style={{ margin: 0 }}>Konfirmasi Pengumpulan Ujian</h3>
+              <h3 style={{ margin: 0, fontSize: "1.08rem" }}>Konfirmasi Pengumpulan Ujian</h3>
             </div>
             <div className="modal-body">
-              <p style={{ color: "var(--ink-light)", fontSize: "0.95rem", marginBottom: 16 }}>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 14 }}>
                 Apakah Anda yakin ingin menyelesaikan dan mengumpulkan ujian ini sekarang? Setelah dikumpulkan, Anda tidak dapat mengubah jawaban lagi.
               </p>
 
               <div
                 style={{
-                  background: "var(--navy-50)",
-                  padding: 16,
+                  background: "var(--bg-surface-secondary)",
+                  padding: 14,
                   borderRadius: "var(--radius-sm)",
                   display: "grid",
                   gap: 8,
-                  fontSize: "0.9rem",
+                  fontSize: "0.88rem",
+                  border: "1px solid var(--border-color)",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -745,16 +746,16 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               <button
                 onClick={executeSubmit}
                 disabled={isSubmitting}
-                className="btn btn-accent"
+                className="btn btn-primary"
                 style={{ fontWeight: 700 }}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" /> Mengumpulkan...
+                    <Loader2 size={15} className="animate-spin" /> Mengumpulkan...
                   </>
                 ) : (
                   <>
-                    <Send size={16} /> Ya, Kumpulkan Sekarang
+                    <Send size={15} /> Ya, Kumpulkan Sekarang
                   </>
                 )}
               </button>

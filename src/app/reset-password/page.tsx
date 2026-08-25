@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Lock, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        padding: "32px 20px",
+        padding: "24px 18px",
         backgroundColor: "var(--bg-canvas)",
         position: "relative",
       }}
@@ -64,8 +64,8 @@ export default function ResetPasswordPage() {
       <div
         style={{
           position: "absolute",
-          top: 24,
-          right: 24,
+          top: 20,
+          right: 20,
           zIndex: 20,
         }}
       >
@@ -73,11 +73,13 @@ export default function ResetPasswordPage() {
       </div>
 
       <section style={{ width: "min(100%, 420px)" }}>
-        <div className="card" style={{ padding: 32 }}>
-          <div style={{ marginBottom: 20 }}>
-            <span className="eyebrow">Keamanan Akun</span>
-            <h1 style={{ fontSize: "1.6rem", margin: "4px 0 8px" }}>Password Baru</h1>
-            <p className="muted" style={{ fontSize: "0.9rem", margin: 0 }}>
+        <div className="card" style={{ padding: "26px 24px" }}>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ marginBottom: 10 }}>
+              <Logo size="md" />
+            </div>
+            <h1 style={{ fontSize: "1.45rem", margin: "4px 0 6px" }}>Password Baru</h1>
+            <p className="muted" style={{ fontSize: "0.86rem", margin: 0 }}>
               Buat password baru yang aman untuk akun Anda.
             </p>
           </div>
@@ -87,8 +89,8 @@ export default function ResetPasswordPage() {
               style={{
                 padding: "12px 14px",
                 borderRadius: "var(--radius-md)",
-                marginBottom: 18,
-                fontSize: "0.88rem",
+                marginBottom: 16,
+                fontSize: "0.86rem",
                 fontWeight: 600,
                 background: status.type === "success" ? "var(--success-bg)" : "var(--danger-bg)",
                 color: status.type === "success" ? "var(--success)" : "var(--danger)",
@@ -103,7 +105,7 @@ export default function ResetPasswordPage() {
             </div>
           )}
 
-          <form onSubmit={handleReset} style={{ display: "grid", gap: 16 }}>
+          <form onSubmit={handleReset} style={{ display: "grid", gap: 14 }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label" htmlFor="password">
                 Password Baru
@@ -163,8 +165,8 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-accent btn-lg"
-              style={{ width: "100%", marginTop: 6 }}
+              className="btn btn-primary btn-lg"
+              style={{ width: "100%", marginTop: 4 }}
             >
               {isSubmitting ? (
                 <>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { UserPlus, Mail, KeyRound, Copy, Check, Send, Loader2, Link2, BookOpen } from "lucide-react";
 import { Profile, Exam } from "@/types";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface ParticipantManagerProps {
   participants: (Profile & { assignments?: { id: string; exam_id: string; exam: { title: string } }[] })[];
@@ -12,6 +13,7 @@ interface ParticipantManagerProps {
 export function ParticipantManager({ participants, exams }: ParticipantManagerProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState<Profile | null>(null);
+  const [targetSendCreds, setTargetSendCreds] = useState<Profile | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdUser, setCreatedUser] = useState<{
     id: string;
@@ -20,7 +22,6 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
     temporary_password?: string;
   } | null>(null);
 
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Handle Add Participant Form Submit
@@ -68,12 +69,13 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
   };
 
   // Handle Send Credentials Email
-  const handleSendCredentials = async (participantId: string) => {
+  const handleConfirmSendCredentials = async () => {
+    if (!targetSendCreds) return;
     setIsSubmitting(true);
     setActionMessage(null);
 
     try {
-      const res = await fetch(`/api/admin/users/${participantId}/send-credentials`, {
+      const res = await fetch(`/api/admin/users/${targetSendCreds.id}/send-credentials`, {
         method: "POST",
       });
       const data = await res.json();
@@ -94,6 +96,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
       setActionMessage({ type: "error", text: "Terjadi kesalahan koneksi." });
     } finally {
       setIsSubmitting(false);
+      setTargetSendCreds(null);
     }
   };
 
@@ -148,12 +151,12 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
           alignItems: "center",
           flexWrap: "wrap",
           gap: 16,
-          marginBottom: 24,
+          marginBottom: 20,
         }}
       >
         <div>
-          <h2 style={{ fontSize: "1.35rem" }}>Daftar Akun Peserta ({participants.length})</h2>
-          <p className="muted" style={{ fontSize: "0.88rem", margin: 0 }}>
+          <h2 style={{ fontSize: "1.25rem" }}>Daftar Akun Peserta ({participants.length})</h2>
+          <p className="muted" style={{ fontSize: "0.86rem", margin: 0 }}>
             Kelola data akun, penugasan sesi ujian, dan pengiriman kredensial via SMTP
           </p>
         </div>
@@ -170,14 +173,14 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
       {actionMessage && (
         <div
           style={{
-            padding: "14px 18px",
+            padding: "12px 16px",
             borderRadius: "var(--radius-sm)",
-            marginBottom: 20,
-            fontSize: "0.9rem",
+            marginBottom: 18,
+            fontSize: "0.88rem",
             fontWeight: 600,
             background: actionMessage.type === "success" ? "var(--success-bg)" : "var(--danger-bg)",
             color: actionMessage.type === "success" ? "var(--success)" : "var(--danger)",
-            border: `1px solid ${actionMessage.type === "success" ? "#86efac" : "#fca5a5"}`,
+            border: `1px solid ${actionMessage.type === "success" ? "var(--success-border)" : "var(--danger-border)"}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -198,22 +201,22 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         <div
           className="card"
           style={{
-            padding: 20,
-            marginBottom: 24,
-            background: "linear-gradient(to right, #f0fdf4, #ffffff)",
-            border: "1.5px solid #86efac",
+            padding: 18,
+            marginBottom: 20,
+            background: "var(--success-bg)",
+            border: "1px solid var(--success-border)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <span className="badge badge-success" style={{ marginBottom: 8 }}>
+              <span className="badge badge-success" style={{ marginBottom: 6 }}>
                 Akun Baru Dibuat
               </span>
-              <h4 style={{ margin: "4px 0" }}>{createdUser.full_name} ({createdUser.email})</h4>
+              <h4 style={{ margin: "2px 0" }}>{createdUser.full_name} ({createdUser.email})</h4>
               {createdUser.temporary_password && (
-                <div style={{ marginTop: 8, fontSize: "0.9rem" }}>
+                <div style={{ marginTop: 6, fontSize: "0.88rem" }}>
                   <span className="muted">Password Sementara:</span>{" "}
-                  <code style={{ background: "#e2e8f0", padding: "2px 8px", borderRadius: 4, fontWeight: 800 }}>
+                  <code style={{ background: "var(--bg-surface-secondary)", padding: "2px 8px", borderRadius: 4, fontWeight: 800 }}>
                     {createdUser.temporary_password}
                   </code>
                 </div>
@@ -249,7 +252,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                 return (
                   <tr key={p.id}>
                     <td>
-                      <strong style={{ display: "block", color: "var(--navy-900)" }}>{p.full_name}</strong>
+                      <strong style={{ display: "block", color: "var(--text-primary)" }}>{p.full_name}</strong>
                       <span className="muted" style={{ fontSize: "0.82rem" }}>{p.email}</span>
                     </td>
                     <td>
@@ -273,7 +276,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                       </span>
                     </td>
                     <td>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                         <button
                           onClick={() => setShowAssignModal(p)}
                           className="btn btn-primary btn-sm"
@@ -281,7 +284,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                           + Assign Ujian
                         </button>
                         <button
-                          onClick={() => handleSendCredentials(p.id)}
+                          onClick={() => setTargetSendCreds(p)}
                           disabled={isSubmitting}
                           className="btn btn-outline btn-sm"
                           title="Kirim kredensial/reset password via SMTP"
@@ -309,10 +312,10 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3 style={{ margin: 0 }}>Tambah Akun Peserta Baru</h3>
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Tambah Akun Peserta Baru</h3>
             </div>
             <form onSubmit={handleAddParticipant}>
-              <div className="modal-body" style={{ display: "grid", gap: 14 }}>
+              <div className="modal-body" style={{ display: "grid", gap: 12 }}>
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" htmlFor="m_full_name">Nama Lengkap *</label>
                   <input id="m_full_name" name="full_name" type="text" className="field" required />
@@ -334,7 +337,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                   </div>
                 </div>
 
-                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.88rem", cursor: "pointer", marginTop: 4 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.86rem", cursor: "pointer", marginTop: 4 }}>
                   <input type="checkbox" name="send_email" defaultChecked style={{ width: 16, height: 16 }} />
                   <span>Kirim kredensial login via email SMTP</span>
                 </label>
@@ -367,13 +370,13 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3 style={{ margin: 0 }}>Tugaskan Ujian ke Peserta</h3>
+              <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Tugaskan Ujian ke Peserta</h3>
               <p className="muted" style={{ fontSize: "0.85rem", margin: "4px 0 0" }}>
                 Peserta: <strong>{showAssignModal.full_name}</strong> ({showAssignModal.email})
               </p>
             </div>
             <form onSubmit={handleAssignExam}>
-              <div className="modal-body" style={{ display: "grid", gap: 14 }}>
+              <div className="modal-body" style={{ display: "grid", gap: 12 }}>
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" htmlFor="exam_id">Pilih Ujian *</label>
                   <select id="exam_id" name="exam_id" className="field" required>
@@ -418,6 +421,19 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
           </div>
         </div>
       )}
+
+      {/* Interactive ConfirmDialog for Sending Credentials */}
+      <ConfirmDialog
+        isOpen={!!targetSendCreds}
+        title="Kirim Kredensial via Email?"
+        description={`Apakah Anda ingin mengirimkan email berisi instruksi login / reset password ke alamat ${targetSendCreds?.email}?`}
+        confirmText="Ya, Kirim Email"
+        cancelText="Batal"
+        variant="primary"
+        isLoading={isSubmitting}
+        onConfirm={handleConfirmSendCredentials}
+        onClose={() => setTargetSendCreds(null)}
+      />
     </div>
   );
 }

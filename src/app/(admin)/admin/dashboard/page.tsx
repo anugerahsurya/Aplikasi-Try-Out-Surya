@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
           }}
         >
           <div>
-            <span className="eyebrow" style={{ color: "var(--navy-600)" }}>
+            <span className="eyebrow">
               Administrator Panel
             </span>
             <h1 style={{ fontSize: "1.85rem", margin: "4px 0" }}>Ringkasan Operasional</h1>
@@ -167,7 +167,7 @@ export default async function AdminDashboard() {
             <span className="muted" style={{ fontSize: "0.88rem", fontWeight: 600 }}>
               Ujian Berjalan (Aktif)
             </span>
-            <div className="stat-card-number" style={{ color: "#2563eb" }}>
+            <div className="stat-card-number" style={{ color: "var(--brand-accent)" }}>
               {activeAttemptCount ?? 0}
             </div>
             <span className="muted" style={{ fontSize: "0.82rem", marginTop: 8 }}>

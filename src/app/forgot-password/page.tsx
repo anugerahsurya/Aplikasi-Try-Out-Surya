@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -50,7 +51,7 @@ export default function ForgotPasswordPage() {
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        padding: "32px 20px",
+        padding: "24px 18px",
         backgroundColor: "var(--bg-canvas)",
         position: "relative",
       }}
@@ -58,8 +59,8 @@ export default function ForgotPasswordPage() {
       <div
         style={{
           position: "absolute",
-          top: 24,
-          right: 24,
+          top: 20,
+          right: 20,
           zIndex: 20,
         }}
       >
@@ -74,19 +75,21 @@ export default function ForgotPasswordPage() {
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
-            fontSize: "0.88rem",
+            fontSize: "0.86rem",
             fontWeight: 600,
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
           <ArrowLeft size={16} /> Kembali ke Halaman Login
         </Link>
 
-        <div className="card" style={{ padding: 32 }}>
-          <div style={{ marginBottom: 20 }}>
-            <span className="eyebrow">Pemulihan Akun</span>
-            <h1 style={{ fontSize: "1.6rem", margin: "4px 0 8px" }}>Reset Password</h1>
-            <p className="muted" style={{ fontSize: "0.9rem", margin: 0 }}>
+        <div className="card" style={{ padding: "26px 24px" }}>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ marginBottom: 10 }}>
+              <Logo size="md" />
+            </div>
+            <h1 style={{ fontSize: "1.45rem", margin: "4px 0 6px" }}>Reset Password</h1>
+            <p className="muted" style={{ fontSize: "0.86rem", margin: 0 }}>
               Masukkan alamat email akun Anda untuk menerima instruksi pembuatan password baru.
             </p>
           </div>
@@ -96,8 +99,8 @@ export default function ForgotPasswordPage() {
               style={{
                 padding: "12px 14px",
                 borderRadius: "var(--radius-md)",
-                marginBottom: 18,
-                fontSize: "0.88rem",
+                marginBottom: 16,
+                fontSize: "0.86rem",
                 fontWeight: 600,
                 background: status.type === "success" ? "var(--success-bg)" : "var(--danger-bg)",
                 color: status.type === "success" ? "var(--success)" : "var(--danger)",
@@ -112,7 +115,7 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: "grid", gap: 16 }}>
+          <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14 }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label" htmlFor="email">
                 Alamat Email Terdaftar
@@ -144,8 +147,8 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-accent btn-lg"
-              style={{ width: "100%", marginTop: 6 }}
+              className="btn btn-primary btn-lg"
+              style={{ width: "100%", marginTop: 4 }}
             >
               {isSubmitting ? (
                 <>

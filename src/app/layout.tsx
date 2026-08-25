@@ -9,8 +9,8 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NavyTryout — Platform Ujian & Try Out Digital",
-  description: "Platform ujian digital dan Try Out terstandar dengan pengawasan aman dan penilaian presisi.",
+  title: "Try Out Yuk — Platform Ujian & Simulasi Try Out Digital",
+  description: "Platform simulasi ujian dan Try Out digital terpadu dengan pengawasan aman dan analisis nilai presisi.",
 };
 
 export default function RootLayout({

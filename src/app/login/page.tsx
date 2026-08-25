@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Sparkles, Asterisk } from "lucide-react";
 import { LoginForm } from "./login-form";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 
 export default function LoginPage() {
   return (
@@ -10,8 +10,8 @@ export default function LoginPage() {
       <div
         style={{
           position: "absolute",
-          top: 24,
-          right: 24,
+          top: 20,
+          right: 20,
           display: "flex",
           alignItems: "center",
           gap: 10,
@@ -22,16 +22,16 @@ export default function LoginPage() {
       </div>
 
       <section className="login-split-card">
-        {/* Left Side: Visual Aurora Banner Card */}
+        {/* Left Side: Visual Aurora Banner Card (Deep Obsidian & Iris) */}
         <div className="login-left-banner">
-          <div className="login-banner-star">
-            <Asterisk size={24} strokeWidth={2.5} />
+          <div>
+            <Logo size="md" showText={false} />
           </div>
 
           <div className="login-banner-content">
-            <p className="banner-eyebrow">Platform Ujian & Try Out Terstandar</p>
+            <p className="banner-eyebrow">Simulasi Try Out Terpadu 2026</p>
             <h2 className="banner-heading">
-              Akses simulasi ujian terbaik dengan pemantauan aman dan penilaian presisi.
+              Tingkatkan kesiapan ujian dengan analisis nilai presisi dan evaluasi terstandar.
             </h2>
           </div>
         </div>
@@ -39,14 +39,14 @@ export default function LoginPage() {
         {/* Right Side: Clean Form Container */}
         <div className="login-right-form">
           <div style={{ marginBottom: 18 }}>
-            <div className="login-brand-icon">
-              <Asterisk size={18} strokeWidth={2.5} />
+            <div style={{ marginBottom: 10 }}>
+              <Logo size="md" />
             </div>
-            <h1 style={{ fontSize: "1.5rem", margin: "0 0 4px", fontWeight: 800 }}>
+            <h1 style={{ fontSize: "1.45rem", margin: "0 0 4px", fontWeight: 800 }}>
               Masuk ke Akun
             </h1>
-            <p className="muted" style={{ fontSize: "0.86rem", margin: 0 }}>
-              Akses sesi ujian, evaluasi nilai, dan analisis hasil belajar Anda.
+            <p className="muted" style={{ fontSize: "0.85rem", margin: 0 }}>
+              Silakan masukkan email dan password akun Anda untuk memulai sesi.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
               Lupa password?
             </Link>
             <span className="muted" style={{ fontSize: "0.8rem" }}>
-              Bantuan admin
+              Bantuan Pengawas
             </span>
           </div>
         </div>
