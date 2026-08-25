@@ -214,60 +214,67 @@ ALTER TABLE public.attempt_question_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attempt_answers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attempt_events ENABLE ROW LEVEL SECURITY;
 
-DO $$ BEGIN
-  DROP POLICY IF EXISTS "profile select" ON public.profiles;
-  CREATE POLICY "profile select" ON public.profiles FOR SELECT USING (id = auth.uid() OR public.is_admin());
+-- Profiles Policies
+DROP POLICY IF EXISTS "profile select" ON public.profiles;
+CREATE POLICY "profile select" ON public.profiles FOR SELECT USING (id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "profile update" ON public.profiles FOR UPDATE USING (id = auth.uid() OR public.is_admin());
+DROP POLICY IF EXISTS "profile update" ON public.profiles;
+CREATE POLICY "profile update" ON public.profiles FOR UPDATE USING (id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "admin exams" ON public.exams;
-  CREATE POLICY "admin exams" ON public.exams FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+-- Exams Policies
+DROP POLICY IF EXISTS "admin exams" ON public.exams;
+CREATE POLICY "admin exams" ON public.exams FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
-  DROP POLICY IF EXISTS "participant published exams" ON public.exams;
-  CREATE POLICY "participant published exams" ON public.exams FOR SELECT USING (status = 'published');
+DROP POLICY IF EXISTS "participant published exams" ON public.exams;
+CREATE POLICY "participant published exams" ON public.exams FOR SELECT USING (status = 'published');
 
-  DROP POLICY IF EXISTS "admin sections" ON public.exam_sections;
-  CREATE POLICY "admin sections" ON public.exam_sections FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+-- Exam Sections Policies
+DROP POLICY IF EXISTS "admin sections" ON public.exam_sections;
+CREATE POLICY "admin sections" ON public.exam_sections FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
-  DROP POLICY IF EXISTS "participant sections" ON public.exam_sections;
-  CREATE POLICY "participant sections" ON public.exam_sections FOR SELECT USING (true);
+DROP POLICY IF EXISTS "participant sections" ON public.exam_sections;
+CREATE POLICY "participant sections" ON public.exam_sections FOR SELECT USING (true);
 
-  DROP POLICY IF EXISTS "admin questions" ON public.questions;
-  CREATE POLICY "admin questions" ON public.questions FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+-- Questions Policies
+DROP POLICY IF EXISTS "admin questions" ON public.questions;
+CREATE POLICY "admin questions" ON public.questions FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
-  DROP POLICY IF EXISTS "participant questions" ON public.questions;
-  CREATE POLICY "participant questions" ON public.questions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "participant questions" ON public.questions;
+CREATE POLICY "participant questions" ON public.questions FOR SELECT USING (true);
 
-  DROP POLICY IF EXISTS "admin options" ON public.question_options;
-  CREATE POLICY "admin options" ON public.question_options FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+-- Question Options Policies
+DROP POLICY IF EXISTS "admin options" ON public.question_options;
+CREATE POLICY "admin options" ON public.question_options FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
-  DROP POLICY IF EXISTS "participant options" ON public.question_options;
-  CREATE POLICY "participant options" ON public.question_options FOR SELECT USING (true);
+DROP POLICY IF EXISTS "participant options" ON public.question_options;
+CREATE POLICY "participant options" ON public.question_options FOR SELECT USING (true);
 
-  DROP POLICY IF EXISTS "assignment access" ON public.exam_assignments;
-  CREATE POLICY "assignment access" ON public.exam_assignments FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
+-- Assignments Policies
+DROP POLICY IF EXISTS "assignment access" ON public.exam_assignments;
+CREATE POLICY "assignment access" ON public.exam_assignments FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "admin assignments" ON public.exam_assignments;
-  CREATE POLICY "admin assignments" ON public.exam_assignments FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "admin assignments" ON public.exam_assignments;
+CREATE POLICY "admin assignments" ON public.exam_assignments FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
-  DROP POLICY IF EXISTS "attempts access" ON public.attempts;
-  CREATE POLICY "attempts access" ON public.attempts FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
+-- Attempts Policies
+DROP POLICY IF EXISTS "attempts access" ON public.attempts;
+CREATE POLICY "attempts access" ON public.attempts FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "attempts insert" ON public.attempts;
-  CREATE POLICY "attempts insert" ON public.attempts FOR INSERT WITH CHECK (user_id = auth.uid() OR public.is_admin());
+DROP POLICY IF EXISTS "attempts insert" ON public.attempts;
+CREATE POLICY "attempts insert" ON public.attempts FOR INSERT WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "attempts update" ON public.attempts;
-  CREATE POLICY "attempts update" ON public.attempts FOR UPDATE USING (user_id = auth.uid() OR public.is_admin());
+DROP POLICY IF EXISTS "attempts update" ON public.attempts;
+CREATE POLICY "attempts update" ON public.attempts FOR UPDATE USING (user_id = auth.uid() OR public.is_admin());
 
-  DROP POLICY IF EXISTS "answers access" ON public.attempt_answers;
-  CREATE POLICY "answers access" ON public.attempt_answers FOR ALL USING (true);
+-- Answers, Events & Snapshots
+DROP POLICY IF EXISTS "answers access" ON public.attempt_answers;
+CREATE POLICY "answers access" ON public.attempt_answers FOR ALL USING (true);
 
-  DROP POLICY IF EXISTS "events access" ON public.attempt_events;
-  CREATE POLICY "events access" ON public.attempt_events FOR ALL USING (true);
+DROP POLICY IF EXISTS "events access" ON public.attempt_events;
+CREATE POLICY "events access" ON public.attempt_events FOR ALL USING (true);
 
-  DROP POLICY IF EXISTS "snapshots access" ON public.attempt_question_snapshots;
-  CREATE POLICY "snapshots access" ON public.attempt_question_snapshots FOR ALL USING (true);
-END $$;
+DROP POLICY IF EXISTS "snapshots access" ON public.attempt_question_snapshots;
+CREATE POLICY "snapshots access" ON public.attempt_question_snapshots FOR ALL USING (true);
 
 -- 5. AUTO-CONFIRM USER & ELEVATE TO SUPER_ADMIN
 UPDATE auth.users
