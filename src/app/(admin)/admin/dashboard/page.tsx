@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
 
 export default async function AdminDashboard() {
   const { supabase, user, profile } = await requireAdmin();
@@ -382,13 +383,21 @@ export default async function AdminDashboard() {
                         )}
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        <Link
-                          href={`/admin/attempts/${att.id}`}
-                          className="btn btn-outline btn-sm"
-                          style={{ fontSize: "0.78rem" }}
-                        >
-                          <ExternalLink size={12} /> Audit Detail
-                        </Link>
+                        <div style={{ display: "inline-flex", gap: 6, justifyContent: "flex-end" }}>
+                          <ResetAttemptButton
+                            attemptId={att.id}
+                            studentName={att.profile?.full_name || "Peserta"}
+                            examTitle={att.exam?.title}
+                            size="sm"
+                          />
+                          <Link
+                            href={`/admin/attempts/${att.id}`}
+                            className="btn btn-outline btn-sm"
+                            style={{ fontSize: "0.78rem" }}
+                          >
+                            <ExternalLink size={12} /> Audit Detail
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))

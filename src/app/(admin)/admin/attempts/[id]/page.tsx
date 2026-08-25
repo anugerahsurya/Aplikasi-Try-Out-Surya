@@ -18,6 +18,8 @@ import {
 import { Attempt, Exam, Profile, AttemptEvent } from "@/types";
 import { calculateQuestionScore } from "@/lib/scoring";
 
+import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
+
 export default async function AdminAttemptAuditPage({
   params,
 }: {
@@ -27,13 +29,13 @@ export default async function AdminAttemptAuditPage({
   const { supabase, user, profile } = await requireAdmin();
 
   // Fetch attempt with exam and profile
-  const { data: attempt, error } = await supabase
+  const { data: attempt, error: attemptError } = await supabase
     .from("attempts")
     .select("*, exam:exams(*), profile:profiles(*)")
     .eq("id", id)
     .single();
 
-  if (error || !attempt) {
+  if (attemptError || !attempt) {
     notFound();
   }
 
@@ -82,23 +84,32 @@ export default async function AdminAttemptAuditPage({
           <ArrowLeft size={16} /> Kembali ke Ringkasan
         </Link>
 
-        {exam?.id && (
-          <div style={{ display: "flex", gap: 8 }}>
-            <Link
-              href={`/admin/exams/${exam.id}/leaderboard`}
-              className="btn btn-outline btn-sm"
-            >
-              <Trophy size={14} color="#d97706" /> Lihat Rekap Nilai
-            </Link>
-            <a
-              href={`/api/admin/exams/${exam.id}/export`}
-              download
-              className="btn btn-primary btn-sm"
-            >
-              <Download size={14} /> Unduh Excel (.csv)
-            </a>
-          </div>
-        )}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <ResetAttemptButton
+            attemptId={attempt.id}
+            studentName={participant?.full_name || "Peserta"}
+            examTitle={exam?.title}
+            redirectUrlOnSuccess="/admin/dashboard"
+            variant="outline"
+          />
+          {exam?.id && (
+            <>
+              <Link
+                href={`/admin/exams/${exam.id}/leaderboard`}
+                className="btn btn-outline btn-sm"
+              >
+                <Trophy size={14} color="#d97706" /> Lihat Rekap Nilai
+              </Link>
+              <a
+                href={`/api/admin/exams/${exam.id}/export`}
+                download
+                className="btn btn-primary btn-sm"
+              >
+                <Download size={14} /> Unduh Excel (.csv)
+              </a>
+            </>
+          )}
+        </div>
       </div>
 
         {/* Top Summary Card */}

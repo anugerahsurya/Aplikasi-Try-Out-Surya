@@ -14,6 +14,7 @@ import {
   FileText,
 } from "lucide-react";
 import { Exam } from "@/types";
+import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
 
 export default async function AdminExamLeaderboardPage({
   params,
@@ -259,12 +260,21 @@ export default async function AdminExamLeaderboardPage({
                         )}
                       </td>
                       <td style={{ textAlign: "right" }}>
-                        <Link
-                          href={`/admin/attempts/${att.id}`}
-                          className="btn btn-outline btn-sm"
-                        >
-                          <ExternalLink size={12} /> Audit Detail
-                        </Link>
+                        <div style={{ display: "inline-flex", gap: 6, justifyContent: "flex-end" }}>
+                          <ResetAttemptButton
+                            attemptId={att.id}
+                            studentName={p.full_name || "Peserta"}
+                            examTitle={exam.title}
+                            variant="outline"
+                            size="sm"
+                          />
+                          <Link
+                            href={`/admin/attempts/${att.id}`}
+                            className="btn btn-outline btn-sm"
+                          >
+                            <ExternalLink size={12} /> Audit Detail
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );
