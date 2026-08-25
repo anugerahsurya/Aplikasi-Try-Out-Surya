@@ -251,8 +251,7 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
             )}
           </>
         )}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "2px" }}>
-          <NotificationDropdown />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "2px" }}>
           <ThemeToggle />
         </div>
       </nav>

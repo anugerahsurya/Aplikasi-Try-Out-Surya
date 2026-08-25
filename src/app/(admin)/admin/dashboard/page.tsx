@@ -16,17 +16,21 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
+import { AnnouncementManager } from "@/components/admin/AnnouncementManager";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function AdminDashboard() {
   const { supabase, user, profile } = await requireAdmin();
+  const adminSupabase = createAdminClient();
 
-  // Parallel Metrics & Recent Attempts Fetching
+  // Parallel Metrics, Recent Attempts, and Announcements Fetching
   const [
     { count: examCount },
     { count: participantCount },
     { count: activeAttemptCount },
     { count: violationCount },
     { data: recentAttempts },
+    { data: announcements },
   ] = await Promise.all([
     supabase.from("exams").select("*", { count: "exact", head: true }),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "participant"),
@@ -40,6 +44,11 @@ export default async function AdminDashboard() {
       .select("*, exam:exams(title), profile:profiles(full_name, email)")
       .order("created_at", { ascending: false })
       .limit(8),
+    adminSupabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
 
   return (
@@ -416,6 +425,9 @@ export default async function AdminDashboard() {
             </table>
           </div>
         </section>
+
+        {/* System Announcements & Broadcast Manager */}
+        <AnnouncementManager initialAnnouncements={(announcements as any) || []} />
       </div>
   );
 }

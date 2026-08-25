@@ -426,30 +426,33 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {/* Timer */}
-            <div className={`quiz-timer ${timeLeftSeconds < 300 ? "timer-warning" : ""}`}>
-              <Clock size={18} />
+            <div
+              className={`quiz-timer ${timeLeftSeconds < 300 ? "timer-warning" : ""}`}
+              style={{ padding: "4px 10px", fontSize: "0.95rem" }}
+            >
+              <Clock size={15} />
               <span>{formattedTime}</span>
             </div>
 
             {/* Fullscreen Toggle */}
             <button
               onClick={enterFullscreen}
-              className="btn btn-ghost btn-sm"
-              style={{ color: "#cbd5e1" }}
+              className="btn btn-ghost btn-sm desktop-only"
+              style={{ color: "#cbd5e1", padding: 6 }}
               title="Fullscreen"
             >
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             </button>
 
             {/* Submit Button */}
             <button
               onClick={() => setShowSubmitModal(true)}
               className="btn btn-accent btn-sm"
-              style={{ fontWeight: 700 }}
+              style={{ fontWeight: 700, padding: "5px 12px", fontSize: "0.82rem" }}
             >
-              <Send size={14} /> Selesai Ujian
+              <Send size={13} /> Selesai
             </button>
           </div>
         </div>
@@ -709,23 +712,23 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
       {/* Submit Confirmation Modal */}
       {showSubmitModal && (
         <div className="modal-backdrop">
-          <div className="modal-card">
+          <div className="modal-card" style={{ maxWidth: 440, width: "100%", margin: "0 auto" }}>
             <div className="modal-header">
-              <h3 style={{ margin: 0, fontSize: "1.08rem" }}>Konfirmasi Pengumpulan Ujian</h3>
+              <h3 style={{ margin: 0, fontSize: "1.08rem" }}>Konfirmasi Kumpulkan Ujian</h3>
             </div>
-            <div className="modal-body">
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 14 }}>
-                Apakah Anda yakin ingin menyelesaikan dan mengumpulkan ujian ini sekarang? Setelah dikumpulkan, Anda tidak dapat mengubah jawaban lagi.
+            <div className="modal-body" style={{ padding: "16px 18px" }}>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: 12, lineHeight: 1.5 }}>
+                Apakah Anda yakin ingin mengumpulkan ujian ini? Setelah dikumpulkan, jawaban akan langsung dinilai dan tidak dapat diubah lagi.
               </p>
 
               <div
                 style={{
                   background: "var(--bg-surface-secondary)",
-                  padding: 14,
+                  padding: "12px 14px",
                   borderRadius: "var(--radius-sm)",
                   display: "grid",
-                  gap: 8,
-                  fontSize: "0.88rem",
+                  gap: 6,
+                  fontSize: "0.85rem",
                   border: "1px solid var(--border-color)",
                 }}
               >
@@ -747,27 +750,37 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
+            <div
+              className="modal-footer"
+              style={{
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+                padding: "12px 18px 16px",
+              }}
+            >
               <button
                 onClick={() => setShowSubmitModal(false)}
                 disabled={isSubmitting}
-                className="btn btn-outline"
+                className="btn btn-outline btn-sm"
+                style={{ flex: "1 1 100px", justifyContent: "center" }}
               >
-                Batal & Lanjut Mengerjakan
+                Batal
               </button>
               <button
                 onClick={executeSubmit}
                 disabled={isSubmitting}
-                className="btn btn-primary"
-                style={{ fontWeight: 700 }}
+                className="btn btn-primary btn-sm"
+                style={{ flex: "1 1 140px", fontWeight: 700, justifyContent: "center" }}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 size={15} className="animate-spin" /> Mengumpulkan...
+                    <Loader2 size={14} className="animate-spin" /> Mengumpulkan...
                   </>
                 ) : (
                   <>
-                    <Send size={15} /> Ya, Kumpulkan Sekarang
+                    <Send size={14} /> Ya, Kumpulkan
                   </>
                 )}
               </button>
