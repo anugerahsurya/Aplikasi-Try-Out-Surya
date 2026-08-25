@@ -12,12 +12,16 @@ export default async function ParticipantLeaderboardPage({
   const { examId } = await params;
   const { supabase, user } = await requireUser();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(examId);
+
   // Fetch exam details
-  const { data: exam, error: examError } = await supabase
-    .from("exams")
-    .select("*")
-    .or(`id.eq.${examId},slug.eq.${examId}`)
-    .maybeSingle();
+  let examQuery = supabase.from("exams").select("*");
+  if (isUuid) {
+    examQuery = examQuery.eq("id", examId);
+  } else {
+    examQuery = examQuery.eq("slug", examId);
+  }
+  const { data: exam, error: examError } = await examQuery.maybeSingle();
 
   if (examError || !exam) {
     notFound();

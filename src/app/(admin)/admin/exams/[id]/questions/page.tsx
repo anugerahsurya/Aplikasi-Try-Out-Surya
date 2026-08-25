@@ -16,12 +16,16 @@ export default async function ExamQuestionsPage({
   const { id } = await params;
   const { supabase, user, profile } = await requireAdmin();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
   // Fetch exam
-  const { data: exam, error: examError } = await supabase
-    .from("exams")
-    .select("*")
-    .eq("id", id)
-    .single();
+  let examQuery = supabase.from("exams").select("*");
+  if (isUuid) {
+    examQuery = examQuery.eq("id", id);
+  } else {
+    examQuery = examQuery.eq("slug", id);
+  }
+  const { data: exam, error: examError } = await examQuery.maybeSingle();
 
   if (examError || !exam) {
     notFound();
@@ -31,7 +35,7 @@ export default async function ExamQuestionsPage({
   const { data: questions } = await supabase
     .from("questions")
     .select("*, question_options(*)")
-    .eq("exam_id", id)
+    .eq("exam_id", exam.id)
     .order("position", { ascending: true });
 
   const questionList = questions || [];

@@ -13,11 +13,16 @@ export default async function ExamSettingsPage({
   const { id } = await params;
   const { supabase, user, profile } = await requireAdmin();
 
-  const { data: exam, error } = await supabase
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  let examQuery = supabase
     .from("exams")
-    .select("*, questions(id), exam_assignments(id)")
-    .eq("id", id)
-    .single();
+    .select("*, questions(id), exam_assignments(id)");
+  if (isUuid) {
+    examQuery = examQuery.eq("id", id);
+  } else {
+    examQuery = examQuery.eq("slug", id);
+  }
+  const { data: exam, error } = await examQuery.maybeSingle();
 
   if (error || !exam) {
     notFound();

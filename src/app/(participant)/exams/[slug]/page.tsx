@@ -5,6 +5,8 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Clock, ShieldAlert, FileText, CheckCircle, ArrowLeft, Play, AlertTriangle } from "lucide-react";
 import { Exam, Profile } from "@/types";
 
+import { createAdminClient } from "@/lib/supabase/admin";
+
 export default async function ExamDetailPage({
   params,
 }: {
@@ -19,12 +21,37 @@ export default async function ExamDetailPage({
     .eq("id", user.id)
     .single();
 
-  // Find exam by slug or id
-  const { data: exam } = await supabase
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+
+  // Query exam by UUID or slug
+  let examQuery = supabase
     .from("exams")
-    .select("*, questions(id, position, scoring_mode, section_id)")
-    .or(`slug.eq.${slug},id.eq.${slug}`)
-    .maybeSingle();
+    .select("*, questions(id, position, scoring_mode, section_id)");
+
+  if (isUuid) {
+    examQuery = examQuery.eq("id", slug);
+  } else {
+    examQuery = examQuery.eq("slug", slug);
+  }
+
+  let { data: exam } = await examQuery.maybeSingle();
+
+  // If not found via user client, try admin client for admin/super_admin
+  if (!exam && (profile?.role === "admin" || profile?.role === "super_admin")) {
+    const adminSupabase = createAdminClient();
+    let adminQuery = adminSupabase
+      .from("exams")
+      .select("*, questions(id, position, scoring_mode, section_id)");
+    if (isUuid) {
+      adminQuery = adminQuery.eq("id", slug);
+    } else {
+      adminQuery = adminQuery.eq("slug", slug);
+    }
+    const { data: adminExam } = await adminQuery.maybeSingle();
+    if (adminExam) {
+      exam = adminExam;
+    }
+  }
 
   if (!exam) {
     notFound();
@@ -39,8 +66,8 @@ export default async function ExamDetailPage({
     .eq("status", "active")
     .maybeSingle();
 
-  // If published exam and no assignment exists, auto-provision assignment
-  if (!assignment && exam.status === "published") {
+  // If published exam or admin user, auto-provision assignment if not yet existing
+  if (!assignment && (exam.status === "published" || profile?.role === "admin" || profile?.role === "super_admin")) {
     const { data: autoAssigned } = await supabase
       .from("exam_assignments")
       .upsert(
@@ -77,6 +104,19 @@ export default async function ExamDetailPage({
   async function handleStartExam() {
     "use server";
     const { supabase: s, user: u } = await requireUser();
+
+    // Ensure assignment exists
+    await s
+      .from("exam_assignments")
+      .upsert(
+        {
+          exam_id: exam.id,
+          user_id: u.id,
+          attempt_limit: 1,
+          status: "active",
+        },
+        { onConflict: "exam_id,user_id" }
+      );
 
     // Call start_or_resume_attempt RPC
     const { data: attemptId, error } = await s.rpc("start_or_resume_attempt", {

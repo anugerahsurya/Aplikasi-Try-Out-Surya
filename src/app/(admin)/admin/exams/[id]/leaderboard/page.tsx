@@ -24,12 +24,16 @@ export default async function AdminExamLeaderboardPage({
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
   // Fetch exam details
-  const { data: exam, error: examError } = await supabase
-    .from("exams")
-    .select("*, questions(id)")
-    .or(`id.eq.${id},slug.eq.${id}`)
-    .maybeSingle();
+  let examQuery = supabase.from("exams").select("*, questions(id)");
+  if (isUuid) {
+    examQuery = examQuery.eq("id", id);
+  } else {
+    examQuery = examQuery.eq("slug", id);
+  }
+  const { data: exam, error: examError } = await examQuery.maybeSingle();
 
   if (examError || !exam) {
     notFound();
