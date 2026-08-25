@@ -1,0 +1,66 @@
+[
+  {
+    "section_title": "Tes Wawasan Kebangsaan (TWK)",
+    "stem": "Lembaga negara yang berwenang memutus sengketa kewenangan lembaga negara yang kewenangannya diberikan oleh Undang-Undang Dasar adalah...",
+    "scoring_mode": "correctness",
+    "correct_score": 5,
+    "incorrect_score": 0,
+    "blank_score": 0,
+    "explanation": "Sesuai Pasal 24C UUD 1945, Mahkamah Konstitusi berwenang mengadili pada tingkat pertama dan terakhir yang putusannya bersifat final untuk memutus sengketa kewenangan lembaga negara.",
+    "options": [
+      { "label": "A", "content": "Mahkamah Agung", "is_correct": false },
+      { "label": "B", "content": "Mahkamah Konstitusi", "is_correct": true },
+      { "label": "C", "content": "Komisi Yudisial", "is_correct": false },
+      { "label": "D", "content": "Dewan Perwakilan Rakyat", "is_correct": false },
+      { "label": "E", "content": "Badan Pemeriksa Keuangan", "is_correct": false }
+    ]
+  },
+  {
+    "section_title": "Tes Intelegensia Umum (TIU)",
+    "stem": "Jika SEMUA peserta ujian membawa kartu ujian, dan SEBAGIAN peserta membawa penggaris, maka simpulan yang paling tepat adalah...",
+    "scoring_mode": "correctness",
+    "correct_score": 5,
+    "incorrect_score": 0,
+    "blank_score": 0,
+    "explanation": "Karena sebagian peserta membawa penggaris dan seluruh peserta membawa kartu ujian, maka sebagian peserta yang membawa kartu ujian juga membawa penggaris.",
+    "options": [
+      { "label": "A", "content": "Sebagian peserta yang membawa kartu ujian membawa penggaris", "is_correct": true },
+      { "label": "B", "content": "Semua peserta membawa kartu ujian dan penggaris", "is_correct": false },
+      { "label": "C", "content": "Peserta yang tidak membawa penggaris tidak membawa kartu ujian", "is_correct": false },
+      { "label": "D", "content": "Semua peserta yang membawa penggaris tidak membawa kartu ujian", "is_correct": false },
+      { "label": "E", "content": "Tidak dapat ditarik simpulan", "is_correct": false }
+    ]
+  },
+  {
+    "section_title": "Tes Karakteristik Pribadi (TKP)",
+    "stem": "Saat Anda sedang menyelesaikan laporan mendesak yang harus diserahkan sore ini, rekan kerja satu tim tiba-tiba meminta bantuan menyelesaikan tugasnya karena ia kurang paham. Sikap Anda adalah...",
+    "scoring_mode": "option_value",
+    "correct_score": 0,
+    "incorrect_score": 0,
+    "blank_score": 0,
+    "explanation": "Poin 5 diberikan pada sikap integritas dan manajemen prioritas kerja: menuntaskan tanggung jawab utama lalu sigap membantu rekan kerja hingga tuntas.",
+    "options": [
+      { "label": "A", "content": "Menolak secara tegas karena pekerjaan saya jauh lebih penting.", "score_value": 1 },
+      { "label": "B", "content": "Meninggalkan tugas saya sementara demi membantu rekan tim tersebut.", "score_value": 2 },
+      { "label": "C", "content": "Menyuruh rekan lain yang terlihat santai untuk membantunya.", "score_value": 3 },
+      { "label": "D", "content": "Memberikan petunjuk pokok cara penyelesaiannya secara ringkas lalu fokus menyelesaikan tugas saya.", "score_value": 4 },
+      { "label": "E", "content": "Fokus menuntaskan laporan saya terlebih dahulu, kemudian langsung membantunya hingga selesai.", "score_value": 5 }
+    ]
+  },
+  {
+    "section_title": "Simulasi UTBK / Skema Minus",
+    "stem": "Sebuah mobil menempuh jarak 120 km dalam waktu 2 jam. Jika kecepatan ditingkatkan sebesar 20 km/jam, berapakah waktu yang dibutuhkan untuk menempuh jarak yang sama?",
+    "scoring_mode": "correctness",
+    "correct_score": 4,
+    "incorrect_score": -1,
+    "blank_score": 0,
+    "explanation": "Kecepatan awal = 120/2 = 60 km/jam. Kecepatan baru = 60 + 20 = 80 km/jam. Waktu baru = 120 / 80 = 1.5 jam (1 jam 30 menit).",
+    "options": [
+      { "label": "A", "content": "1 jam", "is_correct": false },
+      { "label": "B", "content": "1.5 jam", "is_correct": true },
+      { "label": "C", "content": "1.75 jam", "is_correct": false },
+      { "label": "D", "content": "2 jam", "is_correct": false },
+      { "label": "E", "content": "2.5 jam", "is_correct": false }
+    ]
+  }
+]

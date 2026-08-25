@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { AppShell } from "@/components/layout/app-shell";
 import { QuestionForm } from "@/components/admin/QuestionForm";
 import { QuestionItem } from "@/components/admin/QuestionItem";
+import { BulkQuestionImporter } from "@/components/admin/BulkQuestionImporter";
 import { ArrowLeft, Clock, FileText, Settings, AlertCircle } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
@@ -87,7 +88,7 @@ export default async function ExamQuestionsPage({
             {exam.title}
           </h1>
           <p style={{ color: "#cbd5e1", fontSize: "0.88rem", margin: 0 }}>
-            Kelola dan susun butir-butir soal untuk paket ujian ini.
+            Kelola dan susun butir-butir soal untuk paket simulasi ujian ini.
           </p>
         </section>
 
@@ -103,7 +104,7 @@ export default async function ExamQuestionsPage({
               style={{
                 padding: 32,
                 textAlign: "center",
-                color: "var(--muted)",
+                color: "var(--text-muted)",
                 background: "var(--bg-surface-secondary)",
                 marginBottom: 24,
               }}
@@ -111,7 +112,7 @@ export default async function ExamQuestionsPage({
               <AlertCircle size={28} style={{ margin: "0 auto 8px", opacity: 0.5 }} />
               <p style={{ fontWeight: 600, margin: 0 }}>Belum ada soal pada ujian ini.</p>
               <p style={{ fontSize: "0.84rem", marginTop: 4 }}>
-                Silakan gunakan form builder di bawah untuk menyusun soal pertama.
+                Silakan gunakan form builder atau impor massal via JSON di bawah.
               </p>
             </div>
           ) : (
@@ -128,7 +129,12 @@ export default async function ExamQuestionsPage({
           )}
         </section>
 
-        {/* Add Question Form */}
+        {/* Bulk JSON Importer Section */}
+        <section style={{ marginBottom: 28 }}>
+          <BulkQuestionImporter examId={exam.id} />
+        </section>
+
+        {/* Single Add Question Form Builder */}
         <section>
           <QuestionForm examId={exam.id} nextPosition={questionList.length + 1} />
         </section>
