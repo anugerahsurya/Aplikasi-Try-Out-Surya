@@ -3,9 +3,26 @@ import { cookies } from "next/headers";
 
 export async function createClient() {
   const cookieStore = await cookies();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://kkmylhyvmfpmprzghmix.supabase.co";
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "sb_publishable_5ez6A4fwVYYuqGLBjsO2fA_4BCLHaY-";
+
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://placeholder.supabase.co",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder",
-    { cookies: { getAll: () => cookieStore.getAll(), setAll: (items) => { try { items.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } catch { /* Server Components cannot write cookies */ } } } },
+    supabaseUrl,
+    supabaseKey,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (items) => {
+          try {
+            items.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          } catch {
+            // Server Components cannot write cookies
+          }
+        },
+      },
+    }
   );
 }
