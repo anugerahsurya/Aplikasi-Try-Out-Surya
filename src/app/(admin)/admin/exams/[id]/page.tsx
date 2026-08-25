@@ -73,12 +73,7 @@ export default async function ExamSettingsPage({
   const policy = exam.security_policy || {};
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 880, margin: "0 auto" }}>
+    <div style={{ maxWidth: 880, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <Link
             href="/admin/exams"
@@ -294,6 +289,5 @@ export default async function ExamSettingsPage({
           </div>
         </form>
       </div>
-    </AppShell>
   );
 }

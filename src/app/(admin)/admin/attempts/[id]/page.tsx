@@ -70,12 +70,7 @@ export default async function AdminAttemptAuditPage({
   );
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+    <div style={{ maxWidth: 980, margin: "0 auto" }}>
         <Link
           href="/admin/dashboard"
           className="btn btn-ghost btn-sm"
@@ -265,6 +260,5 @@ export default async function AdminAttemptAuditPage({
           </section>
         )}
       </div>
-    </AppShell>
   );
 }

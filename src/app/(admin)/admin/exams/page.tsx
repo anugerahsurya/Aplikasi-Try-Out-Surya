@@ -13,12 +13,7 @@ export default async function AdminExamsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div
           style={{
             display: "flex",
@@ -137,6 +132,5 @@ export default async function AdminExamsPage() {
           )}
         </div>
       </div>
-    </AppShell>
   );
 }

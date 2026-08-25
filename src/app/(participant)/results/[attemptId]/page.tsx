@@ -84,12 +84,7 @@ export default async function ResultPage({
   }
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "participant"}
-    >
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
+    <div style={{ maxWidth: 880, margin: "0 auto" }}>
         <Link
           href="/dashboard"
           className="btn btn-ghost btn-sm"
@@ -326,6 +321,5 @@ export default async function ResultPage({
           </section>
         )}
       </div>
-    </AppShell>
   );
 }

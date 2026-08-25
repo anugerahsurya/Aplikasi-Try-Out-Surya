@@ -58,12 +58,7 @@ export default async function NewExamPage() {
   }
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
+    <div style={{ maxWidth: 840, margin: "0 auto" }}>
         <Link
           href="/admin/exams"
           className="btn btn-ghost btn-sm"
@@ -236,6 +231,5 @@ export default async function NewExamPage() {
           </div>
         </form>
       </div>
-    </AppShell>
   );
 }

@@ -42,12 +42,7 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         {/* Header Title Section */}
         <div
           style={{
@@ -429,6 +424,5 @@ export default async function AdminDashboard() {
           </div>
         </section>
       </div>
-    </AppShell>
   );
 }

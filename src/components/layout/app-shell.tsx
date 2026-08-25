@@ -48,10 +48,12 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", minHeight: "100vh", position: "relative" }}>
+      {/* Persistent Topbar */}
       <header className="topbar">
         <div className="topbar-inner">
           <Link
             href={isInAdminSection ? "/admin/dashboard" : "/dashboard"}
+            prefetch={true}
             style={{ display: "inline-flex", textDecoration: "none", flexShrink: 0 }}
           >
             <Logo size="sm" />
@@ -64,24 +66,28 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
               <>
                 <Link
                   href="/admin/dashboard"
+                  prefetch={true}
                   className={pathname === "/admin/dashboard" ? "active" : ""}
                 >
                   Ringkasan
                 </Link>
                 <Link
                   href="/admin/exams"
+                  prefetch={true}
                   className={pathname.startsWith("/admin/exams") ? "active" : ""}
                 >
                   Kelola Ujian
                 </Link>
                 <Link
                   href="/admin/participants"
+                  prefetch={true}
                   className={pathname === "/admin/participants" ? "active" : ""}
                 >
                   Peserta
                 </Link>
                 <Link
                   href="/dashboard"
+                  prefetch={true}
                   className="btn btn-outline btn-sm"
                   style={{ marginLeft: 8, fontSize: "0.8rem" }}
                   title="Lihat tampilan dashboard sebagai peserta"
@@ -94,12 +100,14 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
               <>
                 <Link
                   href="/dashboard"
+                  prefetch={true}
                   className={pathname === "/dashboard" ? "active" : ""}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/profile"
+                  prefetch={true}
                   className={pathname === "/profile" ? "active" : ""}
                 >
                   Profil Saya
@@ -107,6 +115,7 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
                 {isAdmin && (
                   <Link
                     href="/admin/dashboard"
+                    prefetch={true}
                     className="btn btn-accent btn-sm"
                     style={{ marginLeft: 8, fontSize: "0.8rem", color: "#ffffff" }}
                   >
@@ -163,39 +172,48 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
         </div>
       </header>
 
-      <main className="shell desktop-density">{children}</main>
+      {/* Main Content with Hardware-Accelerated Smooth Page Transition */}
+      <main className="shell desktop-density">
+        <div key={pathname} className="page-transition-content">
+          {children}
+        </div>
+      </main>
 
-      {/* Floating Bottom Navigation for Mobile (Fixed at Viewport Bottom) */}
+      {/* Persistent Floating Bottom Navigation for Mobile (Never Unmounts on Page Change) */}
       <nav className="bottom-nav" aria-label="Navigasi Mobile">
         {isInAdminSection ? (
           // Admin Mobile Navigation
           <>
             <Link
               href="/admin/dashboard"
-              className={pathname === "/admin/dashboard" ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname === "/admin/dashboard" ? "active" : ""}`}
             >
-              <LayoutDashboard size={18} />
+              <LayoutDashboard size={18} className="nav-icon" />
               <span>Ringkasan</span>
             </Link>
             <Link
               href="/admin/exams"
-              className={pathname.startsWith("/admin/exams") ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname.startsWith("/admin/exams") ? "active" : ""}`}
             >
-              <ClipboardList size={18} />
+              <ClipboardList size={18} className="nav-icon" />
               <span>Ujian</span>
             </Link>
             <Link
               href="/admin/participants"
-              className={pathname === "/admin/participants" ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname === "/admin/participants" ? "active" : ""}`}
             >
-              <Users size={18} />
+              <Users size={18} className="nav-icon" />
               <span>Peserta</span>
             </Link>
             <Link
               href="/dashboard"
-              className={pathname === "/dashboard" ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname === "/dashboard" ? "active" : ""}`}
             >
-              <ExternalLink size={18} />
+              <ExternalLink size={18} className="nav-icon" />
               <span>Peserta</span>
             </Link>
           </>
@@ -204,25 +222,28 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
           <>
             <Link
               href="/dashboard"
-              className={pathname === "/dashboard" ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname === "/dashboard" ? "active" : ""}`}
             >
-              <House size={18} />
+              <House size={18} className="nav-icon" />
               <span>Beranda</span>
             </Link>
             <Link
               href="/profile"
-              className={pathname === "/profile" ? "active" : ""}
+              prefetch={true}
+              className={`bottom-nav-item ${pathname === "/profile" ? "active" : ""}`}
             >
-              <UserRound size={18} />
+              <UserRound size={18} className="nav-icon" />
               <span>Profil</span>
             </Link>
             {isAdmin && (
               <Link
                 href="/admin/dashboard"
-                className={pathname.startsWith("/admin") ? "active" : ""}
+                prefetch={true}
+                className={`bottom-nav-item ${pathname.startsWith("/admin") ? "active" : ""}`}
                 style={{ color: "var(--brand-accent)" }}
               >
-                <Shield size={18} />
+                <Shield size={18} className="nav-icon" />
                 <span>Admin</span>
               </Link>
             )}

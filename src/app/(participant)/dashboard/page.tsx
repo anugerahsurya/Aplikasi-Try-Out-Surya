@@ -77,12 +77,7 @@ export default async function ParticipantDashboard() {
   const estimatedProbability = completedCount > 0 ? Math.min(96, 75 + completedCount * 7) : 78;
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "participant"}
-    >
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+    <div style={{ maxWidth: 980, margin: "0 auto" }}>
         {/* Warm Greeting Hero with Dynamic Gradient Mesh */}
         <section
           className="stat-card-crafted"
@@ -420,6 +415,5 @@ export default async function ParticipantDashboard() {
           </section>
         )}
       </div>
-    </AppShell>
   );
 }

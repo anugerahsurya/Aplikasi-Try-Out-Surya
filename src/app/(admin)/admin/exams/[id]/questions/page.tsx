@@ -44,12 +44,7 @@ export default async function ExamQuestionsPage({
   }
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "admin"}
-    >
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+    <div style={{ maxWidth: 980, margin: "0 auto" }}>
         {/* Header Breadcrumbs */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
           <Link
@@ -139,6 +134,5 @@ export default async function ExamQuestionsPage({
           <QuestionForm examId={exam.id} nextPosition={questionList.length + 1} />
         </section>
       </div>
-    </AppShell>
   );
 }

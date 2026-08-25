@@ -45,12 +45,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "participant"}
-    >
-      <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 28 }}>
           <span className="eyebrow">Pengaturan Akun</span>
           <h1 style={{ fontSize: "1.85rem", margin: "4px 0" }}>Profil Pengguna</h1>
@@ -178,6 +173,5 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
-    </AppShell>
   );
 }
