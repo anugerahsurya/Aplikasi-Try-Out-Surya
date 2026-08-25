@@ -28,6 +28,17 @@ export async function requireUser() {
   if (!user) {
     redirect("/login");
   }
+
+  // Update last_sign_in_at timestamp for real-time presence tracking
+  try {
+    await supabase
+      .from("profiles")
+      .update({ last_sign_in_at: new Date().toISOString() })
+      .eq("id", user.id);
+  } catch {
+    // Non-blocking fallback
+  }
+
   return { supabase, user };
 }
 
@@ -45,3 +56,4 @@ export async function requireAdmin() {
 
   return { supabase, user, profile: profile as Profile, role: profile.role as AppRole };
 }
+

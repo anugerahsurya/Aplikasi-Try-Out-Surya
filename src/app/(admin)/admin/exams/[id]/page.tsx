@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { AppShell } from "@/components/layout/app-shell";
-import { ArrowLeft, Save, FileText, Settings, ShieldAlert, Users, Clock } from "lucide-react";
+import { ArrowLeft, Save, FileText, Settings, ShieldAlert, Users, Clock, Trophy } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
 export default async function ExamSettingsPage({
@@ -83,7 +83,13 @@ export default async function ExamSettingsPage({
             <ArrowLeft size={16} /> Kembali ke Daftar Ujian
           </Link>
 
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link
+              href={`/admin/exams/${exam.id}/leaderboard`}
+              className="btn btn-outline btn-sm"
+            >
+              <Trophy size={14} color="#d97706" /> Rekap & Peringkat
+            </Link>
             <Link
               href={`/admin/exams/${exam.id}/questions`}
               className="btn btn-primary btn-sm"

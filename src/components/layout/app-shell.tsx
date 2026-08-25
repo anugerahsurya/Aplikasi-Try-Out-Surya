@@ -214,7 +214,7 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
               className={`bottom-nav-item ${pathname === "/dashboard" ? "active" : ""}`}
             >
               <ExternalLink size={18} className="nav-icon" />
-              <span>Peserta</span>
+              <span>Portal</span>
             </Link>
           </>
         ) : (

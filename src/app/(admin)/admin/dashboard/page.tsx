@@ -81,24 +81,22 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* 4 Crafted & Tactile Stat Cards */}
+        {/* 4 Clean & Professional Stat Cards */}
         <div className="grid grid-4" style={{ marginBottom: 28 }}>
           {/* Card 1: Bank Ujian */}
           <div
             className="stat-card-crafted"
             style={{
               borderTop: "3px solid #2563eb",
-              background: "linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-secondary) 100%)",
             }}
           >
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
                     background: "rgba(37, 99, 235, 0.1)",
                     color: "#2563eb",
-                    border: "1px solid rgba(37, 99, 235, 0.2)",
                   }}
                 >
                   <FileText size={18} />
@@ -111,9 +109,6 @@ export default async function AdminDashboard() {
                 Total Bank Ujian
               </span>
               <div className="stat-card-number">{examCount ?? 0}</div>
-              <p className="muted" style={{ fontSize: "0.78rem", margin: "2px 0 10px" }}>
-                Paket simulasi terkonfigurasi
-              </p>
             </div>
             <Link
               href="/admin/exams"
@@ -125,7 +120,8 @@ export default async function AdminDashboard() {
                 alignItems: "center",
                 gap: 4,
                 borderTop: "1px solid var(--border-subtle)",
-                paddingTop: 8,
+                paddingTop: 10,
+                marginTop: 8,
               }}
             >
               Kelola bank soal <ArrowRight size={12} />
@@ -137,32 +133,27 @@ export default async function AdminDashboard() {
             className="stat-card-crafted"
             style={{
               borderTop: "3px solid #10b981",
-              background: "linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-secondary) 100%)",
             }}
           >
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
                     background: "rgba(16, 185, 129, 0.1)",
                     color: "#10b981",
-                    border: "1px solid rgba(16, 185, 129, 0.2)",
                   }}
                 >
                   <Users size={18} />
                 </div>
                 <span className="badge badge-success" style={{ fontSize: "0.7rem" }}>
-                  Terdaftar
+                  Peserta
                 </span>
               </div>
               <span className="muted" style={{ fontSize: "0.82rem", fontWeight: 600, display: "block" }}>
                 Peserta Terdaftar
               </span>
               <div className="stat-card-number">{participantCount ?? 0}</div>
-              <p className="muted" style={{ fontSize: "0.78rem", margin: "2px 0 10px" }}>
-                Siswa dengan akun aktif
-              </p>
             </div>
             <Link
               href="/admin/participants"
@@ -174,7 +165,8 @@ export default async function AdminDashboard() {
                 alignItems: "center",
                 gap: 4,
                 borderTop: "1px solid var(--border-subtle)",
-                paddingTop: 8,
+                paddingTop: 10,
+                marginTop: 8,
               }}
             >
               Manajemen peserta <ArrowRight size={12} />
@@ -186,17 +178,15 @@ export default async function AdminDashboard() {
             className="stat-card-crafted"
             style={{
               borderTop: "3px solid #0284c7",
-              background: "linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-secondary) 100%)",
             }}
           >
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
                     background: "rgba(2, 132, 199, 0.1)",
                     color: "#0284c7",
-                    border: "1px solid rgba(2, 132, 199, 0.2)",
                   }}
                 >
                   <Activity size={18} />
@@ -209,16 +199,13 @@ export default async function AdminDashboard() {
                 </span>
               </div>
               <span className="muted" style={{ fontSize: "0.82rem", fontWeight: 600, display: "block" }}>
-                Sesi Live Berjalan
+                Sesi Berjalan
               </span>
               <div className="stat-card-number" style={{ color: "var(--brand-accent)" }}>
                 {activeAttemptCount ?? 0}
               </div>
-              <p className="muted" style={{ fontSize: "0.78rem", margin: "2px 0 10px" }}>
-                {activeAttemptCount && activeAttemptCount > 0 ? "Peserta sedang mengerjakan" : "Tidak ada sesi aktif"}
-              </p>
             </div>
-            <span
+            <div
               style={{
                 fontSize: "0.8rem",
                 color: "var(--text-muted)",
@@ -227,11 +214,12 @@ export default async function AdminDashboard() {
                 alignItems: "center",
                 gap: 4,
                 borderTop: "1px solid var(--border-subtle)",
-                paddingTop: 8,
+                paddingTop: 10,
+                marginTop: 8,
               }}
             >
-              Real-time monitoring
-            </span>
+              {activeAttemptCount && activeAttemptCount > 0 ? "Peserta sedang aktif" : "Tidak ada sesi aktif"}
+            </div>
           </div>
 
           {/* Card 4: Event Pengawasan & Keamanan */}
@@ -239,17 +227,15 @@ export default async function AdminDashboard() {
             className="stat-card-crafted"
             style={{
               borderTop: `3px solid ${violationCount && violationCount > 0 ? "#ef4444" : "#10b981"}`,
-              background: "linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-secondary) 100%)",
             }}
           >
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
                     background: violationCount && violationCount > 0 ? "rgba(239, 68, 68, 0.1)" : "rgba(16, 185, 129, 0.1)",
                     color: violationCount && violationCount > 0 ? "#ef4444" : "#10b981",
-                    border: `1px solid ${violationCount && violationCount > 0 ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.2)"}`,
                   }}
                 >
                   {violationCount && violationCount > 0 ? <AlertTriangle size={18} /> : <ShieldCheck size={18} />}
@@ -258,11 +244,11 @@ export default async function AdminDashboard() {
                   className={`badge ${violationCount && violationCount > 0 ? "badge-danger" : "badge-success"}`}
                   style={{ fontSize: "0.7rem" }}
                 >
-                  {violationCount && violationCount > 0 ? "Insiden" : "Integritas 100%"}
+                  {violationCount && violationCount > 0 ? "Insiden" : "Aman"}
                 </span>
               </div>
               <span className="muted" style={{ fontSize: "0.82rem", fontWeight: 600, display: "block" }}>
-                Log Audit Keamanan
+                Pelanggaran Ujian
               </span>
               <div
                 className="stat-card-number"
@@ -270,11 +256,8 @@ export default async function AdminDashboard() {
               >
                 {violationCount ?? 0}
               </div>
-              <p className="muted" style={{ fontSize: "0.78rem", margin: "2px 0 10px" }}>
-                {violationCount && violationCount > 0 ? "Pelanggaran fokus/tab" : "Seluruh sesi berjalan aman"}
-              </p>
             </div>
-            <span
+            <div
               style={{
                 fontSize: "0.8rem",
                 color: "var(--text-muted)",
@@ -283,11 +266,12 @@ export default async function AdminDashboard() {
                 alignItems: "center",
                 gap: 4,
                 borderTop: "1px solid var(--border-subtle)",
-                paddingTop: 8,
+                paddingTop: 10,
+                marginTop: 8,
               }}
             >
-              Anti-Cheat Engine Aktif
-            </span>
+              {violationCount && violationCount > 0 ? `${violationCount}x keluar fokus` : "Log audit normal"}
+            </div>
           </div>
         </div>
 

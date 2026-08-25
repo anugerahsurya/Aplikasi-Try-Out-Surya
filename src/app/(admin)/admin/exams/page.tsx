@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { AppShell } from "@/components/layout/app-shell";
-import { PlusCircle, Clock, FileText, Settings, ShieldAlert, CheckCircle2, ArrowRight } from "lucide-react";
+import { PlusCircle, Clock, FileText, Settings, ShieldAlert, CheckCircle2, ArrowRight, Trophy } from "lucide-react";
 import { Exam } from "@/types";
 
 export default async function AdminExamsPage() {
@@ -102,13 +102,21 @@ export default async function AdminExamsPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: 8, borderTop: "1px solid var(--border-subtle)", paddingTop: 14 }}>
+                  <div style={{ display: "flex", gap: 6, borderTop: "1px solid var(--border-subtle)", paddingTop: 14 }}>
                     <Link
                       href={`/admin/exams/${exam.id}/questions`}
                       className="btn btn-primary btn-sm"
                       style={{ flex: 1, fontSize: "0.8rem" }}
                     >
                       <FileText size={14} /> Kelola Soal
+                    </Link>
+                    <Link
+                      href={`/admin/exams/${exam.id}/leaderboard`}
+                      className="btn btn-outline btn-sm"
+                      title="Lihat Peringkat & Export Nilai"
+                      style={{ padding: "6px 10px" }}
+                    >
+                      <Trophy size={14} color="#d97706" />
                     </Link>
                     <Link
                       href={`/admin/exams/${exam.id}`}

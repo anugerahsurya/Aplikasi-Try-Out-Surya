@@ -20,6 +20,7 @@ export interface Profile {
   avatar_path?: string | null;
   phone?: string | null;
   institution?: string | null;
+  last_sign_in_at?: string | null;
   created_at: string;
   updated_at: string;
 }

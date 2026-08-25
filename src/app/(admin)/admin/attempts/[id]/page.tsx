@@ -12,6 +12,8 @@ import {
   FileText,
   User,
   Monitor,
+  Trophy,
+  Download,
 } from "lucide-react";
 import { Attempt, Exam, Profile, AttemptEvent } from "@/types";
 import { calculateQuestionScore } from "@/lib/scoring";
@@ -71,13 +73,33 @@ export default async function AdminAttemptAuditPage({
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
         <Link
           href="/admin/dashboard"
           className="btn btn-ghost btn-sm"
-          style={{ marginBottom: 18, paddingLeft: 0 }}
+          style={{ paddingLeft: 0 }}
         >
-          <ArrowLeft size={16} /> Kembali ke Dashboard Admin
+          <ArrowLeft size={16} /> Kembali ke Ringkasan
         </Link>
+
+        {exam?.id && (
+          <div style={{ display: "flex", gap: 8 }}>
+            <Link
+              href={`/admin/exams/${exam.id}/leaderboard`}
+              className="btn btn-outline btn-sm"
+            >
+              <Trophy size={14} color="#d97706" /> Lihat Rekap Nilai
+            </Link>
+            <a
+              href={`/api/admin/exams/${exam.id}/export`}
+              download
+              className="btn btn-primary btn-sm"
+            >
+              <Download size={14} /> Unduh Excel (.csv)
+            </a>
+          </div>
+        )}
+      </div>
 
         {/* Top Summary Card */}
         <section className="card-navy" style={{ padding: "32px 28px", marginBottom: 28 }}>

@@ -74,18 +74,28 @@ export default async function ParticipantDashboard() {
 
   const totalExamsCount = assignedExams.length;
   const completedCount = completedAttempts?.length || 0;
-  const estimatedProbability = completedCount > 0 ? Math.min(96, 75 + completedCount * 7) : 78;
+  
+  // Passing probability calculation based on actual completed exams
+  let estimatedProbability = 0;
+  if (completedCount > 0 && completedAttempts) {
+    const validScores = completedAttempts.filter((a: any) => typeof a.score === "number");
+    if (validScores.length > 0) {
+      const avgScore = validScores.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0) / validScores.length;
+      // Normalized rate (0 - 100%)
+      estimatedProbability = Math.min(100, Math.max(0, Math.round(avgScore > 100 ? (avgScore / 500) * 100 : avgScore)));
+    }
+  }
 
   return (
     <div style={{ maxWidth: 980, margin: "0 auto" }}>
-        {/* Warm Greeting Hero with Dynamic Gradient Mesh */}
+        {/* Warm Greeting Hero */}
         <section
           className="stat-card-crafted"
           style={{
             padding: "24px 22px",
             marginBottom: 24,
-            background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(56, 189, 248, 0.05) 50%, var(--bg-surface) 100%)",
-            border: "1px solid rgba(37, 99, 235, 0.18)",
+            background: "var(--bg-surface)",
+            border: "1px solid var(--border-color)",
             position: "relative",
             overflow: "hidden",
           }}
@@ -130,8 +140,8 @@ export default async function ParticipantDashboard() {
                     width: 38,
                     height: 38,
                     borderRadius: 10,
-                    background: "rgba(16, 185, 129, 0.12)",
-                    color: "var(--success)",
+                    background: completedCount > 0 ? "rgba(16, 185, 129, 0.12)" : "rgba(100, 116, 139, 0.12)",
+                    color: completedCount > 0 ? "var(--success)" : "var(--text-muted)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -143,8 +153,8 @@ export default async function ParticipantDashboard() {
                   <span className="muted" style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase" }}>
                     Passing Probability
                   </span>
-                  <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--success)" }}>
-                    {estimatedProbability}%
+                  <div style={{ fontSize: "1.2rem", fontWeight: 800, color: completedCount > 0 ? "var(--success)" : "var(--text-muted)" }}>
+                    {completedCount > 0 ? `${estimatedProbability}%` : "0%"}
                   </div>
                 </div>
               </div>

@@ -663,31 +663,31 @@ textarea.field {
   background: var(--bg-surface-hover);
 }
 
-/* Stat Cards (Crafted & Tactile) */
+/* Stat Cards (Crafted & Clean) */
 .stat-card-crafted {
-  padding: 20px 22px;
+  padding: 16px 18px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.04), 0 0 1px 1px rgba(15, 23, 42, 0.02);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px -2px rgba(15, 23, 42, 0.04), 0 0 1px 1px rgba(15, 23, 42, 0.02);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
 
 .stat-card-crafted:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.09), 0 0 0 1px var(--border-focus);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.08), 0 0 0 1px var(--border-focus);
 }
 
 .stat-icon-box {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -696,7 +696,7 @@ textarea.field {
 }
 
 .stat-card-crafted:hover .stat-icon-box {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .live-pulse-dot {
@@ -716,7 +716,7 @@ textarea.field {
 }
 
 .stat-card {
-  padding: 18px 20px;
+  padding: 16px 18px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -730,11 +730,11 @@ textarea.field {
 }
 
 .stat-card-number {
-  font-size: 2.1rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin: 6px 0 2px;
-  letter-spacing: -0.04em;
+  margin: 4px 0 2px;
+  letter-spacing: -0.03em;
   line-height: 1.1;
 }
 
@@ -1056,9 +1056,23 @@ textarea.field {
   }
 }
 
+/* Responsive Visibility Utilities */
+.desktop-only {
+  display: block;
+}
+.mobile-only {
+  display: none !important;
+}
+
 @media (max-width: 640px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: grid !important;
+  }
   .shell, .shell-compact {
-    padding: 14px 12px 104px;
+    padding: 14px 12px 84px;
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
@@ -1079,5 +1093,9 @@ textarea.field {
   }
   .grid-2, .grid-3, .grid-4 {
     grid-template-columns: 1fr;
+  }
+  .modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
   }
 }

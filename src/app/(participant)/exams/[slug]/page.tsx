@@ -24,20 +24,38 @@ export default async function ExamDetailPage({
     .from("exams")
     .select("*, questions(id, position, scoring_mode, section_id)")
     .or(`slug.eq.${slug},id.eq.${slug}`)
-    .single();
+    .maybeSingle();
 
   if (!exam) {
     notFound();
   }
 
   // Check assignment
-  const { data: assignment } = await supabase
+  let { data: assignment } = await supabase
     .from("exam_assignments")
     .select("*")
     .eq("exam_id", exam.id)
     .eq("user_id", user.id)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
+
+  // If published exam and no assignment exists, auto-provision assignment
+  if (!assignment && exam.status === "published") {
+    const { data: autoAssigned } = await supabase
+      .from("exam_assignments")
+      .upsert(
+        {
+          exam_id: exam.id,
+          user_id: user.id,
+          attempt_limit: 1,
+          status: "active",
+        },
+        { onConflict: "exam_id,user_id" }
+      )
+      .select()
+      .maybeSingle();
+    assignment = autoAssigned;
+  }
 
   // Check if there is an in-progress attempt
   const { data: existingAttempt } = await supabase
@@ -74,19 +92,14 @@ export default async function ExamDetailPage({
   }
 
   return (
-    <AppShell
-      userEmail={user.email}
-      userName={profile?.full_name || ""}
-      userRole={profile?.role || "participant"}
-    >
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        <Link
-          href="/dashboard"
-          className="btn btn-ghost btn-sm"
-          style={{ marginBottom: 18, paddingLeft: 0 }}
-        >
-          <ArrowLeft size={16} /> Kembali ke Dashboard
-        </Link>
+    <div style={{ maxWidth: 840, margin: "0 auto" }}>
+      <Link
+        href="/dashboard"
+        className="btn btn-ghost btn-sm"
+        style={{ marginBottom: 18, paddingLeft: 0 }}
+      >
+        <ArrowLeft size={16} /> Kembali ke Dashboard
+      </Link>
 
         {/* Exam Header Card */}
         <section className="card-navy" style={{ padding: "36px 32px", marginBottom: 28 }}>
@@ -233,6 +246,5 @@ export default async function ExamDetailPage({
           </form>
         </div>
       </div>
-    </AppShell>
   );
 }
