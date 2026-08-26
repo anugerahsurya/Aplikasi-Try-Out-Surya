@@ -46,10 +46,8 @@ export function ResetAttemptButton({
           router.push(redirectUrlOnSuccess);
         } else {
           router.refresh();
+          window.location.reload();
         }
-        setTimeout(() => {
-          setIsSuccess(false);
-        }, 3000);
       } else {
         alert(data.error || "Gagal mereset sesi ujian.");
       }
