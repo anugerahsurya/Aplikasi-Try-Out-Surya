@@ -94,19 +94,14 @@ export default async function AdminDashboard() {
         {/* 4 Clean & Professional Stat Cards */}
         <div className="grid grid-4" style={{ marginBottom: 28 }}>
           {/* Card 1: Bank Ujian */}
-          <div
-            className="stat-card-crafted"
-            style={{
-              borderTop: "3px solid #2563eb",
-            }}
-          >
+          <div className="stat-card-crafted">
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
                     background: "rgba(37, 99, 235, 0.1)",
-                    color: "#2563eb",
+                    color: "var(--brand-accent)",
                   }}
                 >
                   <FileText size={18} />
@@ -139,24 +134,19 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Card 2: Peserta Terdaftar */}
-          <div
-            className="stat-card-crafted"
-            style={{
-              borderTop: "3px solid #10b981",
-            }}
-          >
+          <div className="stat-card-crafted">
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
-                    background: "rgba(16, 185, 129, 0.1)",
-                    color: "#10b981",
+                    background: "rgba(37, 99, 235, 0.08)",
+                    color: "var(--brand-accent)",
                   }}
                 >
                   <Users size={18} />
                 </div>
-                <span className="badge badge-success" style={{ fontSize: "0.7rem" }}>
+                <span className="badge badge-navy" style={{ fontSize: "0.7rem" }}>
                   Peserta
                 </span>
               </div>
@@ -169,7 +159,7 @@ export default async function AdminDashboard() {
               href="/admin/participants"
               style={{
                 fontSize: "0.8rem",
-                color: "#10b981",
+                color: "var(--brand-accent)",
                 fontWeight: 700,
                 display: "inline-flex",
                 alignItems: "center",
@@ -184,19 +174,14 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Card 3: Ujian Berjalan (Live) */}
-          <div
-            className="stat-card-crafted"
-            style={{
-              borderTop: "3px solid #0284c7",
-            }}
-          >
+          <div className="stat-card-crafted">
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div
                   className="stat-icon-box"
                   style={{
-                    background: "rgba(2, 132, 199, 0.1)",
-                    color: "#0284c7",
+                    background: "rgba(37, 99, 235, 0.08)",
+                    color: "var(--brand-accent)",
                   }}
                 >
                   <Activity size={18} />
@@ -233,12 +218,7 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Card 4: Event Pengawasan & Keamanan */}
-          <div
-            className="stat-card-crafted"
-            style={{
-              borderTop: `3px solid ${violationCount && violationCount > 0 ? "#ef4444" : "#10b981"}`,
-            }}
-          >
+          <div className="stat-card-crafted">
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div

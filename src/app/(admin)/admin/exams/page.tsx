@@ -53,8 +53,7 @@ export default async function AdminExamsPage() {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    borderTop: `3px solid ${isPublished ? "#10b981" : "#f59e0b"}`,
-                    background: "linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-secondary) 100%)",
+                    background: "var(--bg-surface)",
                   }}
                 >
                   <div>

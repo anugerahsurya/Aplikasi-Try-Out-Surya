@@ -278,13 +278,14 @@ export default async function ParticipantDashboard() {
                 return (
                   <div
                     key={exam.id}
-                    className={`stat-card-crafted ${isNavyTint ? "card-tinted-navy" : "card-tinted-emerald"}`}
+                    className="stat-card-crafted"
                     style={{
                       padding: "20px 20px",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
                       gap: 14,
+                      background: "var(--bg-surface)",
                     }}
                   >
                     <div>
@@ -308,8 +309,8 @@ export default async function ParticipantDashboard() {
                         <div
                           className="stat-icon-box"
                           style={{
-                            background: isNavyTint ? "rgba(37, 99, 235, 0.12)" : "rgba(16, 185, 129, 0.12)",
-                            color: isNavyTint ? "var(--brand-accent)" : "var(--success)",
+                            background: "rgba(37, 99, 235, 0.1)",
+                            color: "var(--brand-accent)",
                           }}
                         >
                           <BookOpen size={18} />
