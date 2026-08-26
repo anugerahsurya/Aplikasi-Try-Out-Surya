@@ -484,11 +484,10 @@ textarea.field {
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
   width: 100%;
-  max-width: 100vw;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow: visible;
   backdrop-filter: blur(12px);
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
@@ -504,6 +503,8 @@ textarea.field {
   justify-content: space-between;
   gap: 8px;
   box-sizing: border-box;
+  overflow: visible;
+  position: relative;
 }
 
 .desktop-nav {
@@ -1049,14 +1050,16 @@ textarea.field {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(5px);
   z-index: 100000;
-  display: grid;
-  place-items: center;
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
   animation: fadeIn 0.15s ease-out;
   box-sizing: border-box;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
@@ -1070,28 +1073,43 @@ textarea.field {
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
   width: 100%;
-  max-width: 480px;
-  overflow: hidden;
+  max-width: 500px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: auto; /* Mencegah modal terpotong di bagian atas pada layar kecil */
+  position: relative;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.modal-card form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .modal-header {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .modal-body {
   padding: 18px 20px;
   box-sizing: border-box;
+  overflow-y: auto;
   overflow-x: hidden;
+  flex: 1 1 auto;
 }
 
 .modal-footer {
@@ -1103,6 +1121,7 @@ textarea.field {
   gap: 10px;
   flex-wrap: wrap;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 /* Responsive Overrides */
@@ -1164,11 +1183,10 @@ textarea.field {
     grid-template-columns: 1fr;
   }
   .modal-card {
-    max-width: calc(100vw - 24px);
+    max-width: 100%;
     width: 100%;
-    margin: 0 auto;
-    max-height: 88vh;
-    overflow-y: auto;
+    margin: auto;
+    max-height: calc(100dvh - 24px);
     box-sizing: border-box;
   }
   .modal-header {

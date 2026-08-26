@@ -48,7 +48,7 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
   };
 
   return (
-    <div style={{ width: "100%", overflowX: "hidden", minHeight: "100vh", position: "relative" }}>
+    <div style={{ width: "100%", minHeight: "100vh", position: "relative" }}>
       {/* Persistent Topbar */}
       <header className="topbar">
         <div className="topbar-inner">

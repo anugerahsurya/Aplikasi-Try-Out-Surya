@@ -266,6 +266,9 @@ CREATE POLICY "attempts insert" ON public.attempts FOR INSERT WITH CHECK (user_i
 DROP POLICY IF EXISTS "attempts update" ON public.attempts;
 CREATE POLICY "attempts update" ON public.attempts FOR UPDATE USING (user_id = auth.uid() OR public.is_admin());
 
+DROP POLICY IF EXISTS "attempts delete" ON public.attempts;
+CREATE POLICY "attempts delete" ON public.attempts FOR DELETE USING (user_id = auth.uid() OR public.is_admin());
+
 -- Answers, Events & Snapshots
 DROP POLICY IF EXISTS "answers access" ON public.attempt_answers;
 CREATE POLICY "answers access" ON public.attempt_answers FOR ALL USING (true);

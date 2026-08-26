@@ -17,8 +17,8 @@ export default async function TryoutRunnerPage({
   });
 
   if (error || !rawData) {
-    console.error("Runner fetch error:", error);
-    notFound();
+    console.warn("Attempt not found or has been reset:", attemptId);
+    redirect("/dashboard");
   }
 
   const runnerData = rawData as RunnerData;
