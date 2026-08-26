@@ -58,6 +58,8 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
   });
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hasEnteredFullscreen, setHasEnteredFullscreen] = useState(false);
+  const hasEnteredFullscreenRef = useRef(false);
   const [violationCount, setViolationCount] = useState(0);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [securityToast, setSecurityToast] = useState<string | null>(null);
@@ -304,6 +306,19 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
         navigator.userAgent
       );
 
+    // Initial fullscreen check on mount
+    const initialFs = Boolean(
+      document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+    );
+    setIsFullscreen(initialFs);
+    if (initialFs) {
+      setHasEnteredFullscreen(true);
+      hasEnteredFullscreenRef.current = true;
+    }
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         logSecurityEvent("tab_hidden", {
@@ -331,7 +346,12 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
           (document as any).msFullscreenElement
       );
       setIsFullscreen(inFullscreen);
-      if (!inFullscreen && policy.require_fullscreen) {
+      if (inFullscreen) {
+        setHasEnteredFullscreen(true);
+        hasEnteredFullscreenRef.current = true;
+        setWarningMessage(null);
+      } else if (policy.require_fullscreen && hasEnteredFullscreenRef.current) {
+        // Only log violation if participant has already entered fullscreen and exited mid-exam
         logSecurityEvent("fullscreen_exit", {
           reason: "Keluar dari mode layar penuh",
           is_mobile: isMobileDevice(),
@@ -479,15 +499,6 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Initial fullscreen state check
-    const initialFs = Boolean(
-      document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
-    );
-    setIsFullscreen(initialFs);
-
     return () => {
       document.documentElement.classList.remove("quiz-secure-lock");
       document.body.classList.remove("quiz-secure-lock");
@@ -535,6 +546,8 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
           await docEl.msRequestFullscreen();
         }
         setIsFullscreen(true);
+        setHasEnteredFullscreen(true);
+        hasEnteredFullscreenRef.current = true;
         setWarningMessage(null);
       } else {
         const doc = document as any;
@@ -551,7 +564,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
       }
     } catch (err) {
       console.warn("Fullscreen request error or unsupported:", err);
-      // On iOS Safari where fullscreen API is not supported on iPhone root element, dismiss warning anyway
+      // On devices where fullscreen API is not supported on documentElement, mark entered anyway
+      setHasEnteredFullscreen(true);
+      hasEnteredFullscreenRef.current = true;
       setWarningMessage(null);
     }
   };
@@ -859,6 +874,45 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
           </div>
         </div>
       </div>
+
+      {/* Initial Fullscreen Gate Modal (Clean & friendly, not a violation) */}
+      {policy.require_fullscreen && !isFullscreen && !hasEnteredFullscreen && (
+        <div className="modal-backdrop" style={{ zIndex: 99999 }}>
+          <div className="modal-card" style={{ maxWidth: 460, width: "100%", margin: "auto", textAlign: "center" }}>
+            <div className="modal-body" style={{ padding: "32px 24px" }}>
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "var(--brand-light)",
+                  color: "var(--brand-accent)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                }}
+              >
+                <Maximize2 size={28} />
+              </div>
+              <h2 style={{ fontSize: "1.25rem", margin: "0 0 8px", fontWeight: 800 }}>
+                Mode Layar Penuh (Fullscreen)
+              </h2>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", lineHeight: 1.5, margin: "0 0 20px" }}>
+                Simulasi ujian ini berjalan dalam mode layar penuh untuk memastikan kenyamanan pengerjaan dan keamanan data soal.
+              </p>
+              <button
+                type="button"
+                onClick={enterFullscreen}
+                className="btn btn-primary btn-lg"
+                style={{ width: "100%", justifyContent: "center", fontWeight: 800 }}
+              >
+                <Maximize2 size={18} /> Masuk Fullscreen & Mulai Ujian
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Security Violation Warning Modal */}
       {warningMessage && (

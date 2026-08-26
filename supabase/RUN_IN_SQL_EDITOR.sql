@@ -347,9 +347,51 @@ INSERT INTO public.question_options (question_id, label, content, position, is_c
 ('33333333-3333-3333-3333-333333333301', 'C', 'Komisi Yudisial', 3, false, null),
 ('33333333-3333-3333-3333-333333333301', 'D', 'Dewan Perwakilan Rakyat', 4, false, null),
 ('33333333-3333-3333-3333-333333333301', 'E', 'Badan Pemeriksa Keuangan', 5, false, null),
-('33333333-3333-3333-3333-333333333302', 'A', 'Menolak secara tegas karena pekerjaan saya jauh lebih penting.', 1, false, 1),
-('33333333-3333-3333-3333-333333333302', 'B', 'Meninggalkan tugas saya sementara demi membantu rekan tim tersebut.', 2, false, 2),
-('33333333-3333-3333-3333-333333333302', 'C', 'Menyuruh rekan lain yang terlihat santai untuk membantunya.', 3, false, 3),
 ('33333333-3333-3333-3333-333333333302', 'D', 'Memberikan petunjuk pokok cara penyelesaiannya secara ringkas lalu fokus menyelesaikan tugas saya.', 4, false, 4),
+('33333333-3333-3333-3333-333333333302', 'E', 'Meminta rekan tim menunggu sebentar hingga tugas saya selesai, baru kemudian membantunya bersama-sama.', 5, false, 5)
+ON CONFLICT (question_id, position) DO NOTHING;
+
+-- Function: Admin Reset Attempt
+CREATE OR REPLACE FUNCTION public.admin_reset_attempt(p_attempt_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_attempt public.attempts;
+  v_student_name text;
+  v_exam_title text;
+BEGIN
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Hanya admin yang dapat mereset sesi ujian.';
+  END IF;
+
+  SELECT * INTO v_attempt FROM public.attempts WHERE id = p_attempt_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Sesi ujian tidak ditemukan.';
+  END IF;
+
+  SELECT full_name INTO v_student_name FROM public.profiles WHERE id = v_attempt.user_id;
+  SELECT title INTO v_exam_title FROM public.exams WHERE id = v_attempt.exam_id;
+
+  DELETE FROM public.attempt_answers WHERE attempt_id = p_attempt_id;
+  DELETE FROM public.attempt_events WHERE attempt_id = p_attempt_id;
+  DELETE FROM public.attempt_question_snapshots WHERE attempt_id = p_attempt_id;
+  DELETE FROM public.attempts WHERE id = p_attempt_id;
+
+  UPDATE public.exam_assignments
+  SET status = 'active'
+  WHERE exam_id = v_attempt.exam_id AND user_id = v_attempt.user_id;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'student_name', COALESCE(v_student_name, 'Peserta'),
+    'exam_title', COALESCE(v_exam_title, 'Ujian')
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_reset_attempt(uuid) TO authenticated;
 ('33333333-3333-3333-3333-333333333302', 'E', 'Fokus menuntaskan laporan saya terlebih dahulu, kemudian langsung membantunya hingga selesai.', 5, false, 5)
 ON CONFLICT (question_id, position) DO NOTHING;

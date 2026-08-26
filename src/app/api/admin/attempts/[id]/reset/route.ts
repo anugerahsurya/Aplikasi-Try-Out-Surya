@@ -10,19 +10,43 @@ export async function POST(
   try {
     const { id } = await params;
     // 1. Verify admin authorization
-    await requireAdmin();
+    const { supabase: userSupabase } = await requireAdmin();
 
-    // 2. Use admin client (service role) to bypass RLS
+    // 2. Try RPC admin_reset_attempt first (SECURITY DEFINER, always works without service_role key)
+    const { data: rpcData, error: rpcError } = await userSupabase.rpc("admin_reset_attempt", {
+      p_attempt_id: id,
+    });
+
+    if (!rpcError && rpcData) {
+      // Invalidate Next.js cache across admin and participant paths
+      revalidatePath("/admin/dashboard");
+      revalidatePath("/admin/attempts");
+      revalidatePath(`/admin/attempts/${id}`);
+      revalidatePath("/admin/exams");
+      revalidatePath("/dashboard");
+      revalidatePath("/exams");
+      revalidatePath("/results");
+
+      return NextResponse.json({
+        success: true,
+        message: `Sesi ujian "${rpcData.exam_title || "Ujian"}" untuk ${rpcData.student_name || "Peserta"} berhasil di-reset.`,
+      });
+    }
+
+    // 3. Fallback to direct client delete if RPC is not present
     const adminSupabase = createAdminClient();
+    const activeClient = process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.SUPABASE_SERVICE_ROLE_KEY.includes("placeholder")
+      ? adminSupabase
+      : userSupabase;
 
-    // 3. Fetch attempt details to get user_id and exam_id
-    const { data: attempt, error: fetchError } = await adminSupabase
+    // Fetch attempt details
+    const { data: attempt, error: fetchError } = await activeClient
       .from("attempts")
       .select("id, user_id, exam_id, exam:exams(title), profile:profiles(full_name, email)")
       .eq("id", id)
       .maybeSingle();
 
-    if (fetchError) {
+    if (fetchError && fetchError.message !== "Invalid API key") {
       console.error("Error fetching attempt for reset:", fetchError);
       return NextResponse.json(
         { error: fetchError.message || "Gagal mengambil data sesi ujian." },
@@ -37,14 +61,14 @@ export async function POST(
       );
     }
 
-    // 4. Delete related rows (child tables first to guarantee no foreign key blockers, then attempt itself)
+    // Delete related child rows
     await Promise.all([
-      adminSupabase.from("attempt_answers").delete().eq("attempt_id", id),
-      adminSupabase.from("attempt_events").delete().eq("attempt_id", id),
-      adminSupabase.from("attempt_question_snapshots").delete().eq("attempt_id", id),
+      activeClient.from("attempt_answers").delete().eq("attempt_id", id),
+      activeClient.from("attempt_events").delete().eq("attempt_id", id),
+      activeClient.from("attempt_question_snapshots").delete().eq("attempt_id", id),
     ]);
 
-    const { error: deleteError } = await adminSupabase
+    const { error: deleteError } = await activeClient
       .from("attempts")
       .delete()
       .eq("id", id);
@@ -57,16 +81,16 @@ export async function POST(
       );
     }
 
-    // 5. Ensure assignment is active
+    // Ensure assignment is active
     if (attempt.exam_id && attempt.user_id) {
-      await adminSupabase
+      await activeClient
         .from("exam_assignments")
         .update({ status: "active" })
         .eq("exam_id", attempt.exam_id)
         .eq("user_id", attempt.user_id);
     }
 
-    // 6. Invalidate Next.js cache across admin and participant paths
+    // Invalidate Next.js cache across admin and participant paths
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/attempts");
     revalidatePath(`/admin/attempts/${id}`);

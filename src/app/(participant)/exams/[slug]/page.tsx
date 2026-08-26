@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { AppShell } from "@/components/layout/app-shell";
 import { Clock, ShieldAlert, FileText, CheckCircle, ArrowLeft, Play, AlertTriangle } from "lucide-react";
 import { Exam, Profile } from "@/types";
+import { StartExamAction } from "@/components/exam/StartExamAction";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -274,16 +275,11 @@ export default async function ExamDetailPage({
             </p>
           </div>
 
-          <form action={handleStartExam} style={{ margin: 0 }}>
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg"
-              style={{ fontWeight: 800 }}
-              disabled={!assignment && !existingAttempt}
-            >
-              <Play size={18} /> {existingAttempt ? "Lanjutkan Ujian" : "Mulai Ujian Sekarang"}
-            </button>
-          </form>
+          <StartExamAction
+            examId={exam.id}
+            isExistingAttempt={Boolean(existingAttempt)}
+            disabled={!assignment && !existingAttempt}
+          />
         </div>
       </div>
   );
