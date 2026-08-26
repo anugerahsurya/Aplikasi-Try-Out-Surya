@@ -534,18 +534,15 @@ textarea.field {
    Page Transition Animation (Fast 60fps Hardware-Accelerated)
    ========================================================= */
 .page-transition-content {
-  animation: pageTransitionFade 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+  animation: pageTransitionFade 0.18s ease-out;
 }
 
 @keyframes pageTransitionFade {
   0% {
     opacity: 0.6;
-    transform: translateY(5px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -1039,9 +1036,15 @@ textarea.field {
 /* Modals & Dialogs */
 .modal-backdrop {
   position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(5px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 100000;
   display: flex;
   align-items: center;
@@ -1062,8 +1065,8 @@ textarea.field {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   width: 100%;
   max-width: 500px;
   max-height: calc(100vh - 48px);
@@ -1073,6 +1076,7 @@ textarea.field {
   animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   margin: auto; /* Mencegah modal terpotong di bagian atas pada layar kecil */
   position: relative;
+  overflow: hidden; /* Memotong background header/footer agar presisi dengan radius */
 }
 
 @keyframes modalIn {
@@ -1092,6 +1096,8 @@ textarea.field {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 }
 
 .modal-body {
@@ -1112,6 +1118,8 @@ textarea.field {
   flex-wrap: wrap;
   box-sizing: border-box;
   flex-shrink: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 }
 
 /* Responsive Overrides */
