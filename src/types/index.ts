@@ -135,9 +135,11 @@ export interface RunnerQuestion {
   position: number;
   stem: string;
   options: RunnerOption[];
+  scoring_mode?: ScoringMode;
   selected_option_id?: string | null;
   is_flagged?: boolean;
 }
+
 
 export interface RunnerData {
   id: string;

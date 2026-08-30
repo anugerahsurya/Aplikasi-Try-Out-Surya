@@ -64,7 +64,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [securityToast, setSecurityToast] = useState<string | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showMobilePalette, setShowMobilePalette] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isSubmittingRef = useRef(false);
@@ -601,97 +603,114 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
       {/* Sticky Quiz Header */}
       <header className="quiz-header">
         <div className="quiz-header-inner">
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <h2 style={{ fontSize: "1.08rem", margin: 0, fontWeight: 700 }}>
+          {/* Desktop Left: Exam Title & Sync Badge */}
+          <div className="quiz-header-left-desktop">
+            <h2 className="quiz-header-title" title={initialData.title}>
               {initialData.title}
             </h2>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="quiz-header-sync">
               {syncStatus === "saving" && (
-                <span className="badge badge-warning" style={{ fontSize: "0.75rem" }}>
-                  <Loader2 size={12} className="animate-spin" /> Menyimpan...
+                <span className="badge badge-warning" style={{ fontSize: "0.72rem", padding: "3px 8px" }}>
+                  <Loader2 size={11} className="animate-spin" /> Menyimpan...
                 </span>
               )}
               {syncStatus === "saved" && (
-                <span className="badge badge-success" style={{ fontSize: "0.75rem" }}>
-                  <CheckCircle size={12} /> Tersimpan
+                <span className="badge badge-success" style={{ fontSize: "0.72rem", padding: "3px 8px" }}>
+                  <CheckCircle size={11} /> Tersimpan
                 </span>
               )}
               {syncStatus === "offline" && (
-                <span className="badge badge-danger" style={{ fontSize: "0.75rem" }}>
-                  <WifiOff size={12} /> Offline (Disimpan di browser)
+                <span className="badge badge-danger" style={{ fontSize: "0.72rem", padding: "3px 8px" }}>
+                  <WifiOff size={11} /> Offline
                 </span>
               )}
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Mobile Left: Quick Question Palette Trigger */}
+          <div className="quiz-header-left-mobile">
+            <button
+              type="button"
+              onClick={() => setShowMobilePalette(true)}
+              className="quiz-mobile-nav-pill"
+              title="Buka Daftar Nomor Soal"
+            >
+              <span style={{ fontWeight: 800 }}>No. {currentIndex + 1}</span>
+              <span className="muted" style={{ fontSize: "0.75rem" }}>/ {totalQuestions} ▾</span>
+            </button>
+            {syncStatus === "saving" && <span className="quiz-dot-sync saving" title="Menyimpan..." />}
+            {syncStatus === "offline" && <span className="quiz-dot-sync offline" title="Offline" />}
+          </div>
+
+          {/* Center / Right: Timer, Fullscreen, and Selesai Button */}
+          <div className="quiz-header-right">
             {/* Timer */}
             <div
               className={`quiz-timer ${timeLeftSeconds < 300 ? "timer-warning" : ""}`}
-              style={{ padding: "4px 10px", fontSize: "0.95rem" }}
+              title="Sisa Waktu Ujian"
             >
-              <Clock size={15} />
+              <Clock size={14} className="timer-icon" />
               <span>{formattedTime}</span>
             </div>
 
-            {/* Fullscreen Toggle */}
+            {/* Desktop Fullscreen Toggle */}
             <button
+              type="button"
               onClick={enterFullscreen}
-              className="btn btn-ghost btn-sm"
-              style={{ color: "#cbd5e1", padding: 6 }}
-              title={isFullscreen ? "Keluar Fullscreen" : "Masuk Fullscreen"}
+              className="btn btn-ghost btn-sm desktop-only-btn"
+              style={{ color: "var(--text-secondary)", padding: "5px 8px" }}
+              title={isFullscreen ? "Keluar Layar Penuh" : "Mode Layar Penuh"}
             >
-              {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
 
             {/* Submit Button */}
             <button
+              type="button"
               onClick={() => setShowSubmitModal(true)}
-              className="btn btn-accent btn-sm"
-              style={{ fontWeight: 700, padding: "5px 12px", fontSize: "0.82rem" }}
+              className="btn btn-accent btn-sm quiz-submit-header-btn"
             >
-              <Send size={13} /> Selesai
+              <Send size={12} /> Selesai
             </button>
           </div>
         </div>
 
         {/* Live Answered Questions Progress Bar */}
-        <div style={{ height: 3.5, background: "var(--border-subtle)", width: "100%", overflow: "hidden" }}>
+        <div className="quiz-progress-track">
           <div
+            className="quiz-progress-bar"
             style={{
-              height: "100%",
               width: `${(answeredCount / Math.max(1, totalQuestions)) * 100}%`,
-              background: "linear-gradient(90deg, var(--brand-accent) 0%, var(--success) 100%)",
-              transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           />
         </div>
       </header>
 
-      {/* Main Grid: Question Area + Palette Sidebar */}
+      {/* Main Grid: Question Area + Palette Sidebar (Desktop) */}
       <div className="quiz-grid-layout">
-        {/* Left / Center: Question Card */}
-        <div>
+        {/* Center: Question Card */}
+        <main className="quiz-main-area">
           {currentQuestion ? (
-            <div className="card" style={{ padding: 28, position: "relative" }}>
-              {/* Question Header */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 18,
-                  paddingBottom: 14,
-                  borderBottom: "1px solid var(--border-color)",
-                }}
-              >
-                <div>
-                  <span className="eyebrow">
-                    Soal Nomor {currentIndex + 1} dari {totalQuestions}
+            <div className="card quiz-question-card">
+              {/* Question Card Header */}
+              <div className="quiz-card-header">
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span className="quiz-number-badge">
+                    Soal #{currentIndex + 1}
                   </span>
+                  <span className="muted" style={{ fontSize: "0.8rem", fontWeight: 600 }}>
+                    dari {totalQuestions} Soal
+                  </span>
+                  {currentQuestion.scoring_mode === "option_value" && (
+                    <span className="badge badge-navy" style={{ fontSize: "0.68rem" }}>
+                      Poin 1-5
+                    </span>
+                  )}
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <button
+                    type="button"
                     onClick={handleToggleFlag}
                     className={`btn btn-sm ${
                       answers[currentQuestion.id]?.isFlagged
@@ -699,41 +718,39 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                         : "btn-outline"
                     }`}
                     style={{
+                      fontSize: "0.8rem",
+                      padding: "5px 10px",
                       color: answers[currentQuestion.id]?.isFlagged ? "#b45309" : "inherit",
                       borderColor: answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "var(--border-color)",
+                      background: answers[currentQuestion.id]?.isFlagged ? "#fef3c7" : "transparent",
                     }}
                   >
-                    <Flag size={14} fill={answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "none"} />
-                    {answers[currentQuestion.id]?.isFlagged ? "Ditandai Ragu" : "Ragu-ragu"}
+                    <Flag size={13} fill={answers[currentQuestion.id]?.isFlagged ? "#f59e0b" : "none"} />
+                    <span>{answers[currentQuestion.id]?.isFlagged ? "Ragu-ragu" : "Tandai Ragu"}</span>
                   </button>
 
                   {answers[currentQuestion.id]?.selectedOptionId && (
                     <button
+                      type="button"
                       onClick={handleClearAnswer}
                       className="btn btn-ghost btn-sm"
-                      title="Hapus pilihan"
-                      style={{ color: "var(--text-muted)" }}
+                      title="Reset / Kosongkan Pilihan"
+                      style={{ color: "var(--text-muted)", fontSize: "0.78rem", padding: "5px 8px" }}
                     >
-                      <RotateCcw size={14} /> Hapus Jawaban
+                      <RotateCcw size={13} />
+                      <span className="desktop-inline">Reset</span>
                     </button>
                   )}
                 </div>
               </div>
 
               {/* Stem (Question Content) */}
-              <div
-                style={{
-                  fontSize: "1rem",
-                  lineHeight: 1.7,
-                  color: "var(--text-primary)",
-                  marginBottom: 22,
-                }}
-              >
+              <div className="quiz-stem-content">
                 {currentQuestion.stem}
               </div>
 
               {/* Options List (A - E) */}
-              <div style={{ display: "grid", gap: 10 }}>
+              <div className="quiz-options-list">
                 {currentQuestion.options.map((opt) => {
                   const isSelected =
                     answers[currentQuestion.id]?.selectedOptionId === opt.id;
@@ -745,7 +762,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                       className={`option-item ${isSelected ? "selected" : ""}`}
                     >
                       <span className="option-letter">{opt.label}</span>
-                      <span style={{ fontSize: "0.94rem", lineHeight: 1.5, paddingTop: 3 }}>
+                      <span className="option-content-text">
                         {opt.content}
                       </span>
                     </div>
@@ -754,37 +771,42 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               </div>
 
               {/* Navigation Footer */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginTop: 28,
-                  paddingTop: 16,
-                  borderTop: "1px solid var(--border-subtle)",
-                }}
-              >
+              <div className="quiz-nav-footer">
                 <button
+                  type="button"
                   onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
                   disabled={currentIndex === 0}
-                  className="btn btn-outline"
+                  className="btn btn-outline quiz-nav-btn"
                 >
-                  <ChevronLeft size={18} /> Sebelumnya
+                  <ChevronLeft size={16} /> Sebelumnya
+                </button>
+
+                {/* Mobile Palette Trigger inside Card Footer */}
+                <button
+                  type="button"
+                  onClick={() => setShowMobilePalette(true)}
+                  className="btn btn-ghost btn-sm mobile-only-inline"
+                  style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--brand-accent)" }}
+                >
+                  📑 No. Soal ({answeredCount}/{totalQuestions})
                 </button>
 
                 {currentIndex < totalQuestions - 1 ? (
                   <button
+                    type="button"
                     onClick={() => setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1))}
-                    className="btn btn-primary"
+                    className="btn btn-primary quiz-nav-btn"
                   >
-                    Selanjutnya <ChevronRight size={18} />
+                    Selanjutnya <ChevronRight size={16} />
                   </button>
                 ) : (
                   <button
+                    type="button"
                     onClick={() => setShowSubmitModal(true)}
-                    className="btn btn-accent"
+                    className="btn btn-accent quiz-nav-btn"
+                    style={{ fontWeight: 800 }}
                   >
-                    <Send size={16} /> Selesai & Kirim
+                    <Send size={15} /> Selesai & Kirim
                   </button>
                 )}
               </div>
@@ -794,49 +816,32 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               Tidak ada soal tersedia.
             </div>
           )}
-        </div>
+        </main>
 
-        {/* Right: Question Palette Grid */}
-        <div>
-          <div className="card" style={{ padding: 20, position: "sticky", top: 80 }}>
-            <h3 style={{ fontSize: "1.05rem", marginBottom: 14 }}>Daftar Nomor Soal</h3>
+        {/* Right: Question Palette Sidebar (Desktop Only) */}
+        <aside className="quiz-sidebar-desktop">
+          <div className="card quiz-palette-card">
+            <h3 style={{ fontSize: "1rem", margin: "0 0 12px", fontWeight: 800 }}>
+              Daftar Nomor Soal
+            </h3>
 
             {/* Summary Counters */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 8,
-                marginBottom: 16,
-                padding: "10px 12px",
-                background: "var(--bg-surface-secondary)",
-                borderRadius: "var(--radius-sm)",
-                textAlign: "center",
-                fontSize: "0.78rem",
-                fontWeight: 700,
-              }}
-            >
+            <div className="palette-summary-box">
               <div>
-                <span style={{ color: "var(--text-primary)", display: "block", fontSize: "1.1rem" }}>
-                  {answeredCount}
-                </span>
-                <span className="muted">Dijawab</span>
+                <span className="palette-stat-number answered">{answeredCount}</span>
+                <span className="palette-stat-label">Dijawab</span>
               </div>
               <div>
-                <span style={{ color: "#d97706", display: "block", fontSize: "1.1rem" }}>
-                  {flaggedCount}
-                </span>
-                <span className="muted">Ragu-ragu</span>
+                <span className="palette-stat-number flagged">{flaggedCount}</span>
+                <span className="palette-stat-label">Ragu</span>
               </div>
               <div>
-                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "1.1rem" }}>
-                  {unansweredCount}
-                </span>
-                <span className="muted">Kosong</span>
+                <span className="palette-stat-number unanswered">{unansweredCount}</span>
+                <span className="palette-stat-label">Kosong</span>
               </div>
             </div>
 
-            {/* Palette Buttons */}
+            {/* Palette Buttons Grid */}
             <div className="palette-grid">
               {initialData.questions.map((q, idx) => {
                 const ans = answers[q.id];
@@ -852,9 +857,10 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 return (
                   <button
                     key={q.id}
+                    type="button"
                     onClick={() => setCurrentIndex(idx)}
                     className={className}
-                    title={`Soal ${idx + 1}`}
+                    title={`Soal Nomor ${idx + 1}`}
                   >
                     {idx + 1}
                   </button>
@@ -862,20 +868,112 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               })}
             </div>
 
-            <div style={{ marginTop: 20 }}>
+            <div style={{ marginTop: 18 }}>
               <button
+                type="button"
                 onClick={() => setShowSubmitModal(true)}
                 className="btn btn-primary btn-lg"
-                style={{ width: "100%", fontWeight: 700 }}
+                style={{ width: "100%", fontWeight: 800, fontSize: "0.88rem" }}
               >
-                <Send size={16} /> Kumpulkan Ujian
+                <Send size={15} /> Kumpulkan Ujian
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* Mobile Question Palette Bottom Sheet / Drawer */}
+      {showMobilePalette && (
+        <div className="modal-backdrop" onClick={() => setShowMobilePalette(false)}>
+          <div
+            className="quiz-mobile-drawer-sheet"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="quiz-drawer-header">
+              <div>
+                <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800 }}>
+                  Daftar Nomor Soal
+                </h3>
+                <span className="muted" style={{ fontSize: "0.78rem" }}>
+                  Pilih nomor butir soal untuk berpindah
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMobilePalette(false)}
+                className="btn btn-ghost btn-sm"
+                style={{ padding: "4px 8px", fontSize: "0.85rem" }}
+              >
+                ✕ Tutup
+              </button>
+            </div>
+
+            {/* Summary Counters */}
+            <div className="palette-summary-box" style={{ margin: "10px 16px 14px" }}>
+              <div>
+                <span className="palette-stat-number answered">{answeredCount}</span>
+                <span className="palette-stat-label">Dijawab</span>
+              </div>
+              <div>
+                <span className="palette-stat-number flagged">{flaggedCount}</span>
+                <span className="palette-stat-label">Ragu</span>
+              </div>
+              <div>
+                <span className="palette-stat-number unanswered">{unansweredCount}</span>
+                <span className="palette-stat-label">Kosong</span>
+              </div>
+            </div>
+
+            {/* Mobile Numbers Grid */}
+            <div className="quiz-drawer-grid-container">
+              <div className="palette-grid mobile-palette-grid">
+                {initialData.questions.map((q, idx) => {
+                  const ans = answers[q.id];
+                  const isCurrent = idx === currentIndex;
+                  const isAnswered = Boolean(ans?.selectedOptionId);
+                  const isFlagged = Boolean(ans?.isFlagged);
+
+                  let className = "palette-btn";
+                  if (isAnswered) className += " answered";
+                  if (isFlagged) className += " flagged";
+                  if (isCurrent) className += " current";
+
+                  return (
+                    <button
+                      key={q.id}
+                      type="button"
+                      onClick={() => {
+                        setCurrentIndex(idx);
+                        setShowMobilePalette(false);
+                      }}
+                      className={className}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Drawer Bottom Submit Action */}
+            <div className="quiz-drawer-footer">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobilePalette(false);
+                  setShowSubmitModal(true);
+                }}
+                className="btn btn-primary"
+                style={{ width: "100%", fontWeight: 800 }}
+              >
+                <Send size={15} /> Kumpulkan Jawaban Ujian
               </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Initial Fullscreen Gate Modal (Clean & friendly, not a violation) */}
+      {/* Initial Fullscreen Gate Modal */}
       {policy.require_fullscreen && !isFullscreen && !hasEnteredFullscreen && (
         <div className="modal-backdrop" style={{ zIndex: 99999 }}>
           <div className="modal-card" style={{ maxWidth: 460, width: "100%", margin: "auto", textAlign: "center" }}>
@@ -936,6 +1034,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
             </div>
             <div className="modal-footer">
               <button
+                type="button"
                 onClick={enterFullscreen}
                 className="btn btn-primary"
               >
@@ -998,6 +1097,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               }}
             >
               <button
+                type="button"
                 onClick={() => setShowSubmitModal(false)}
                 disabled={isSubmitting}
                 className="btn btn-outline btn-sm"
@@ -1006,6 +1106,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 Batal
               </button>
               <button
+                type="button"
                 onClick={executeSubmit}
                 disabled={isSubmitting}
                 className="btn btn-primary btn-sm"
@@ -1025,6 +1126,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
           </div>
         </div>
       )}
+
       {/* Security Block Toast Notification */}
       {securityToast && (
         <div className="quiz-toast-warning">
@@ -1035,3 +1137,4 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     </div>
   );
 }
+
