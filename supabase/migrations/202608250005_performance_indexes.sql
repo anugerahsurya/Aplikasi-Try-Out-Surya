@@ -1,3 +1,26 @@
+-- Ensure announcements table exists
+CREATE TABLE IF NOT EXISTS public.announcements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  message text NOT NULL,
+  type text NOT NULL DEFAULT 'announcement',
+  target_role text DEFAULT 'all',
+  is_active boolean NOT NULL DEFAULT true,
+  created_by uuid REFERENCES public.profiles(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "announcements view all" ON public.announcements;
+CREATE POLICY "announcements view all" ON public.announcements
+FOR SELECT USING (is_active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "announcements admin manage" ON public.announcements;
+CREATE POLICY "announcements admin manage" ON public.announcements
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
 -- Performance Optimization Indexes
 -- Indexes for Leaderboard, History, Active Sessions, and Question Loading
 
@@ -29,3 +52,4 @@ ON public.announcements(is_active, created_at DESC);
 -- 7. Question Options position index
 CREATE INDEX IF NOT EXISTS idx_question_options_position 
 ON public.question_options(question_id, position ASC);
+

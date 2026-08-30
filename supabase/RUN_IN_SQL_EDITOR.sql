@@ -163,6 +163,29 @@ CREATE TABLE IF NOT EXISTS public.email_outbox (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS public.announcements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  message text NOT NULL,
+  type text NOT NULL DEFAULT 'announcement',
+  target_role text DEFAULT 'all',
+  is_active boolean NOT NULL DEFAULT true,
+  created_by uuid REFERENCES public.profiles(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "announcements view all" ON public.announcements;
+CREATE POLICY "announcements view all" ON public.announcements
+FOR SELECT USING (is_active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "announcements admin manage" ON public.announcements;
+CREATE POLICY "announcements admin manage" ON public.announcements
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+
 -- 3. TRIGGERS & FUNCTIONS
 CREATE OR REPLACE FUNCTION public.set_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
