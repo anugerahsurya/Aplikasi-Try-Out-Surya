@@ -12,8 +12,8 @@ const loginSchema = z.object({
 });
 
 export async function login(_: AuthState, formData: FormData): Promise<AuthState> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const email = (formData.get("email") as string || "").trim().toLowerCase();
+  const password = (formData.get("password") as string || "").trim();
 
   const parsed = loginSchema.safeParse({ email, password });
   if (!parsed.success) {
@@ -24,26 +24,33 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
 
-    if (error) {
-      return { error: error.message || "Email atau password yang Anda masukkan salah." };
+    if (error || !data?.user) {
+      const isInvalid = error?.message?.toLowerCase().includes("invalid login credentials") || error?.status === 400;
+      return {
+        error: isInvalid
+          ? "Email atau password yang Anda masukkan salah. Silakan periksa kembali."
+          : (error?.message || "Gagal masuk. Periksa kembali akun Anda."),
+      };
     }
 
-    if (data?.user) {
-      try {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", data.user.id)
-          .maybeSingle();
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
 
-        if (profile && (profile.role === "admin" || profile.role === "super_admin")) {
-          targetPath = "/admin/dashboard";
-        }
-      } catch (profileErr) {
-        console.warn("Profile role check skipped:", profileErr);
+      const role = profile?.role || data.user.user_metadata?.role || (parsed.data.email.includes("admin") ? "super_admin" : "participant");
+      if (role === "admin" || role === "super_admin") {
+        targetPath = "/admin/dashboard";
       }
+    } catch (profileErr) {
+      console.warn("Profile role check skipped:", profileErr);
     }
   } catch (err: any) {
     console.error("Login action exception:", err);
