@@ -42,9 +42,10 @@ export default async function ParticipantLeaderboardPage({
   const averageScore =
     totalFinished > 0
       ? Math.round(
-          rankedAttempts.reduce((acc, curr) => acc + (curr.score || 0), 0) / totalFinished
+          rankedAttempts.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0) / totalFinished
         )
       : 0;
+
 
   const userRankIndex = rankedAttempts.findIndex((att) => att.user_id === user.id);
   const userRank = userRankIndex !== -1 ? userRankIndex + 1 : null;

@@ -33,7 +33,8 @@ export default async function AdminAttemptAuditPage({
     .from("attempts")
     .select("*, exam:exams(*), profile:profiles(*)")
     .eq("id", id)
-    .single();
+    .maybeSingle();
+
 
   if (attemptError || !attempt) {
     notFound();

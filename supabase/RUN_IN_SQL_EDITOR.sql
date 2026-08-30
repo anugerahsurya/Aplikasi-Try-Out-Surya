@@ -393,5 +393,27 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.admin_reset_attempt(uuid) TO authenticated;
-('33333333-3333-3333-3333-333333333302', 'E', 'Fokus menuntaskan laporan saya terlebih dahulu, kemudian langsung membantunya hingga selesai.', 5, false, 5)
-ON CONFLICT (question_id, position) DO NOTHING;
+
+-- 7. PERFORMANCE OPTIMIZATION INDEXES
+CREATE INDEX IF NOT EXISTS idx_attempts_leaderboard 
+ON public.attempts(exam_id, status, score DESC NULLS LAST, submitted_at ASC)
+WHERE status IN ('submitted', 'expired');
+
+CREATE INDEX IF NOT EXISTS idx_attempts_user_status 
+ON public.attempts(user_id, status, submitted_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_attempts_status_started 
+ON public.attempts(status, started_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_snapshots_attempt_position 
+ON public.attempt_question_snapshots(attempt_id, position ASC);
+
+CREATE INDEX IF NOT EXISTS idx_exams_status_created 
+ON public.exams(status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_announcements_active_created 
+ON public.announcements(is_active, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_question_options_position 
+ON public.question_options(question_id, position ASC);
+

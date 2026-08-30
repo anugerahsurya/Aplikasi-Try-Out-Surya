@@ -17,8 +17,16 @@ export async function GET() {
       return NextResponse.json({ announcements: [] });
     }
 
-    return NextResponse.json({ announcements: announcements || [] });
+    return NextResponse.json(
+      { announcements: announcements || [] },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        },
+      }
+    );
   } catch (err: any) {
     return NextResponse.json({ announcements: [] });
   }
 }
+

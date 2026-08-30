@@ -39,11 +39,18 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
     }
 
     try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .maybeSingle();
+      // Fetch role and update last_sign_in_at in parallel/cleanly
+      const [{ data: profile }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .maybeSingle(),
+        supabase
+          .from("profiles")
+          .update({ last_sign_in_at: new Date().toISOString() })
+          .eq("id", data.user.id),
+      ]);
 
       const role = profile?.role || data.user.user_metadata?.role || (parsed.data.email.includes("admin") ? "super_admin" : "participant");
       if (role === "admin" || role === "super_admin") {
@@ -56,6 +63,7 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
     console.error("Login action exception:", err);
     return { error: "Terjadi kesalahan sistem saat memproses login. Silakan coba lagi." };
   }
+
 
   redirect(targetPath);
 }

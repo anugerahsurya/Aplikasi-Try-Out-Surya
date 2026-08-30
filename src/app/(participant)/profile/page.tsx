@@ -11,7 +11,8 @@ export default async function ProfilePage() {
     .from("profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
+
 
   async function updateProfile(formData: FormData) {
     "use server";

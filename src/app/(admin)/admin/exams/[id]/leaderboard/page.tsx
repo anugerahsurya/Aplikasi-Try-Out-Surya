@@ -54,9 +54,10 @@ export default async function AdminExamLeaderboardPage({
   const averageScore =
     totalFinished > 0
       ? Math.round(
-          rankedAttempts.reduce((acc, curr) => acc + (curr.score || 0), 0) / totalFinished
+          rankedAttempts.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0) / totalFinished
         )
       : 0;
+
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>

@@ -17,14 +17,15 @@ export default async function ResultPage({
     .from("profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   // Fetch attempt
   const { data: attempt, error: attemptError } = await supabase
     .from("attempts")
     .select("*, exam:exams(*)")
     .eq("id", attemptId)
-    .single();
+    .maybeSingle();
+
 
   if (attemptError || !attempt) {
     notFound();

@@ -42,13 +42,14 @@ export async function POST(
       .from("attempts")
       .select("violation_count, status")
       .eq("id", attemptId)
-      .single();
+      .maybeSingle();
 
     return NextResponse.json({
       success: true,
       violation_count: attempt?.violation_count ?? 0,
-      status: attempt?.status,
+      status: attempt?.status ?? "in_progress",
     });
+
   } catch (err: any) {
     console.error("Error in events API:", err);
     return NextResponse.json({ error: err?.message || "Internal Server Error" }, { status: 500 });
