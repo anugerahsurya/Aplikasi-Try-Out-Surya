@@ -7,3 +7,5 @@ coverage/
 IMPLEMENTATION_PLAN.md
 implementation_plan.md
 scripts/
+.agents/
+agents/

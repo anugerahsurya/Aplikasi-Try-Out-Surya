@@ -20,6 +20,9 @@ import { calculateQuestionScore } from "@/lib/scoring";
 
 import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminAttemptAuditPage({
   params,
 }: {
@@ -155,7 +158,7 @@ export default async function AdminAttemptAuditPage({
           </div>
 
           {eventList.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 24, color: "var(--muted)", background: "var(--navy-50)", borderRadius: 8 }}>
+            <div style={{ textAlign: "center", padding: 24, color: "var(--text-muted)", background: "var(--bg-surface-secondary)", borderRadius: 8 }}>
               Tidak ada rekaman event keamanan tercatat pada sesi ini.
             </div>
           ) : (
@@ -178,8 +181,8 @@ export default async function AdminAttemptAuditPage({
                       justifyContent: "space-between",
                       padding: "10px 14px",
                       borderRadius: "var(--radius-sm)",
-                      background: isViolation ? "var(--danger-bg)" : "var(--navy-50)",
-                      border: `1px solid ${isViolation ? "#fca5a5" : "var(--line)"}`,
+                      background: isViolation ? "var(--danger-bg)" : "var(--bg-surface-secondary)",
+                      border: `1px solid ${isViolation ? "var(--danger-border)" : "var(--border-color)"}`,
                       fontSize: "0.88rem",
                     }}
                   >
@@ -187,10 +190,10 @@ export default async function AdminAttemptAuditPage({
                       {isViolation ? (
                         <AlertTriangle size={16} color="var(--danger)" />
                       ) : (
-                        <CheckCircle2 size={16} color="var(--navy-600)" />
+                        <CheckCircle2 size={16} color="var(--brand-accent)" />
                       )}
                       <div>
-                        <strong style={{ color: isViolation ? "var(--danger)" : "var(--navy-900)" }}>
+                        <strong style={{ color: isViolation ? "var(--danger)" : "var(--text-primary)" }}>
                           {ev.event_type.replace(/_/g, " ").toUpperCase()}
                         </strong>
                         {ev.metadata?.reason && (
@@ -240,8 +243,8 @@ export default async function AdminAttemptAuditPage({
                     style={{
                       padding: 16,
                       borderRadius: "var(--radius-sm)",
-                      border: "1px solid var(--line)",
-                      background: "var(--canvas)",
+                      border: "1px solid var(--border-color)",
+                      background: "var(--bg-surface-secondary)",
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
@@ -260,8 +263,8 @@ export default async function AdminAttemptAuditPage({
                             style={{
                               padding: "6px 10px",
                               borderRadius: 6,
-                              background: isChosen ? "var(--navy-100)" : "#ffffff",
-                              border: `1px solid ${isChosen ? "var(--navy-800)" : "var(--line)"}`,
+                              background: isChosen ? "var(--brand-accent-subtle)" : "var(--bg-surface)",
+                              border: `1px solid ${isChosen ? "var(--brand-accent)" : "var(--border-color)"}`,
                               fontSize: "0.85rem",
                               display: "flex",
                               justifyContent: "space-between",
@@ -277,7 +280,7 @@ export default async function AdminAttemptAuditPage({
                                 </span>
                               )}
                               {isChosen && (
-                                <strong style={{ color: "var(--navy-900)" }}>[Pilihan Peserta]</strong>
+                                <strong style={{ color: "var(--brand-accent)" }}>[Pilihan Peserta]</strong>
                               )}
                               {opt.is_correct && (
                                 <strong style={{ color: "var(--success)", marginLeft: 6 }}>[Kunci]</strong>

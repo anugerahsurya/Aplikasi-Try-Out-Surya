@@ -154,7 +154,7 @@ export default async function NewExamPage() {
           {/* Settings & Randomization */}
           <div className="card" style={{ padding: 28 }}>
             <h3 style={{ fontSize: "1.15rem", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
-              <Settings2 size={18} color="var(--navy-600)" /> Pengaturan Soal & Status
+              <Settings2 size={18} color="var(--brand-accent)" /> Pengaturan Soal & Status
             </h3>
 
             <div style={{ display: "grid", gap: 16 }}>
@@ -187,7 +187,7 @@ export default async function NewExamPage() {
           {/* Security Policy */}
           <div className="card" style={{ padding: 28 }}>
             <h3 style={{ fontSize: "1.15rem", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
-              <ShieldAlert size={18} color="var(--navy-600)" /> Kebijakan Keamanan Anti-Kecurangan
+              <ShieldAlert size={18} color="var(--brand-accent)" /> Kebijakan Keamanan Anti-Kecurangan
             </h3>
 
             <div style={{ display: "grid", gap: 16 }}>

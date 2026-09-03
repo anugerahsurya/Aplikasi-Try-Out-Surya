@@ -19,6 +19,9 @@ import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
 import { AnnouncementManager } from "@/components/admin/AnnouncementManager";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminDashboard() {
   const { supabase, user, profile } = await requireAdmin();
   const adminSupabase = createAdminClient();

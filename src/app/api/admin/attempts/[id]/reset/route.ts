@@ -17,7 +17,9 @@ export async function POST(
       p_attempt_id: id,
     });
 
-    if (!rpcError && rpcData) {
+    if (rpcError) {
+      console.warn("admin_reset_attempt RPC attempt notice:", rpcError.message || rpcError);
+    } else if (rpcData) {
       // Invalidate Next.js cache across admin and participant paths
       revalidatePath("/admin/dashboard");
       revalidatePath("/admin/attempts");
@@ -68,15 +70,27 @@ export async function POST(
       activeClient.from("attempt_question_snapshots").delete().eq("attempt_id", id),
     ]);
 
-    const { error: deleteError } = await activeClient
+    const { data: deletedRows, error: deleteError } = await activeClient
       .from("attempts")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     if (deleteError) {
       console.error("Error deleting attempt:", deleteError);
       return NextResponse.json(
         { error: deleteError.message || "Gagal menghapus sesi ujian dari database." },
+        { status: 500 }
+      );
+    }
+
+    if (!deletedRows || deletedRows.length === 0) {
+      console.error("Reset attempt delete affected 0 rows. RLS policy missing or service role key needed.");
+      return NextResponse.json(
+        {
+          error:
+            "Gagal menghapus sesi ujian (0 baris terhapus karena pembatasan izin database). Mohon jalankan skrip migrasi 'admin_reset_attempt' di Supabase SQL Editor atau isi SUPABASE_SERVICE_ROLE_KEY di .env.local.",
+        },
         { status: 500 }
       );
     }

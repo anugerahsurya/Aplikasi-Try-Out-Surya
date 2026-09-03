@@ -4,6 +4,10 @@ import { requireAdmin } from "@/lib/auth";
 import { AppShell } from "@/components/layout/app-shell";
 import { ArrowLeft, Save, FileText, Settings, ShieldAlert, Users, Clock, Trophy } from "lucide-react";
 import { revalidatePath } from "next/cache";
+import { SendSolutionsModal } from "@/components/admin/SendSolutionsModal";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ExamSettingsPage({
   params,
@@ -27,6 +31,12 @@ export default async function ExamSettingsPage({
   if (error || !exam) {
     notFound();
   }
+
+  const { count: completedCount } = await supabase
+    .from("attempts")
+    .select("*", { count: "exact", head: true })
+    .eq("exam_id", exam.id)
+    .in("status", ["submitted", "expired"]);
 
   async function updateExamSettings(formData: FormData) {
     "use server";
@@ -88,7 +98,16 @@ export default async function ExamSettingsPage({
             <ArrowLeft size={16} /> Kembali ke Daftar Ujian
           </Link>
 
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <SendSolutionsModal
+              examId={exam.id}
+              examTitle={exam.title}
+              examSlug={exam.slug}
+              hasMasterPdf={Boolean(exam.explanation_pdf)}
+              eligibleCount={completedCount || 0}
+              buttonVariant="secondary"
+              buttonSize="sm"
+            />
             <Link
               href={`/admin/exams/${exam.id}/leaderboard`}
               className="btn btn-outline btn-sm"
@@ -225,7 +244,7 @@ export default async function ExamSettingsPage({
           {/* Randomization & Security */}
           <div className="card" style={{ padding: 28 }}>
             <h3 style={{ fontSize: "1.15rem", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
-              <ShieldAlert size={18} color="var(--navy-600)" /> Kebijakan Keamanan & Pengacakan
+              <ShieldAlert size={18} color="var(--brand-accent)" /> Kebijakan Keamanan & Pengacakan
             </h3>
 
             <div style={{ display: "grid", gap: 16 }}>

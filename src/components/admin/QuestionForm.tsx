@@ -34,14 +34,14 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
       action="/api/admin/questions/create"
       method="POST"
       className="card"
-      style={{ padding: 28, border: "2px solid var(--navy-200)" }}
+      style={{ padding: 28, border: "1px solid var(--border-color)" }}
     >
       <input type="hidden" name="exam_id" value={examId} />
       <input type="hidden" name="position" value={nextPosition} />
       <input type="hidden" name="scoring_mode" value={scoringMode} />
 
       <h3 style={{ fontSize: "1.2rem", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-        <PlusCircle size={20} color="var(--navy-600)" /> Tambah Butir Soal Baru (Nomor {nextPosition})
+        <PlusCircle size={20} color="var(--brand-accent)" /> Tambah Butir Soal Baru (Nomor {nextPosition})
       </h3>
 
       <div style={{ display: "grid", gap: 20 }}>
@@ -54,12 +54,13 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
               style={{
                 padding: "14px 16px",
                 borderRadius: "var(--radius-sm)",
-                border: `2px solid ${scoringMode === "correctness" ? "var(--navy-800)" : "var(--line)"}`,
-                background: scoringMode === "correctness" ? "var(--navy-50)" : "#ffffff",
+                border: `2px solid ${scoringMode === "correctness" ? "var(--brand-accent)" : "var(--border-color)"}`,
+                background: scoringMode === "correctness" ? "var(--brand-accent-subtle)" : "var(--bg-surface)",
                 cursor: "pointer",
+                transition: "all 0.2s ease",
               }}
             >
-              <strong style={{ color: "var(--navy-900)", display: "block", fontSize: "0.95rem" }}>
+              <strong style={{ color: "var(--text-primary)", display: "block", fontSize: "0.95rem" }}>
                 1. Jawaban Benar / Salah (TWK / TIU / Akademik)
               </strong>
               <span className="muted" style={{ fontSize: "0.82rem" }}>
@@ -72,12 +73,13 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
               style={{
                 padding: "14px 16px",
                 borderRadius: "var(--radius-sm)",
-                border: `2px solid ${scoringMode === "option_value" ? "var(--navy-800)" : "var(--line)"}`,
-                background: scoringMode === "option_value" ? "var(--navy-50)" : "#ffffff",
+                border: `2px solid ${scoringMode === "option_value" ? "var(--brand-accent)" : "var(--border-color)"}`,
+                background: scoringMode === "option_value" ? "var(--brand-accent-subtle)" : "var(--bg-surface)",
                 cursor: "pointer",
+                transition: "all 0.2s ease",
               }}
             >
-              <strong style={{ color: "var(--navy-900)", display: "block", fontSize: "0.95rem" }}>
+              <strong style={{ color: "var(--text-primary)", display: "block", fontSize: "0.95rem" }}>
                 2. Skor Berjenjang Tiap Opsi 1–5 (TKP / Manajerial)
               </strong>
               <span className="muted" style={{ fontSize: "0.82rem" }}>
@@ -89,7 +91,7 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
 
         {/* Score settings for correctness mode */}
         {scoringMode === "correctness" && (
-          <div className="grid grid-3" style={{ background: "var(--navy-50)", padding: 14, borderRadius: 10 }}>
+          <div className="grid grid-3" style={{ background: "var(--bg-surface-secondary)", padding: 14, borderRadius: 10, border: "1px solid var(--border-color)" }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label" style={{ fontSize: "0.82rem" }}>Skor Benar</label>
               <input type="number" name="correct_score" defaultValue={4} className="field" required />
@@ -134,10 +136,10 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  background: "#ffffff",
+                  background: "var(--bg-surface)",
                   padding: 10,
                   borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--line)",
+                  border: "1px solid var(--border-color)",
                 }}
               >
                 <span
@@ -147,7 +149,7 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "var(--navy-900)",
+                    background: "var(--brand-accent)",
                     color: "#ffffff",
                     borderRadius: 6,
                     fontWeight: 800,
@@ -177,8 +179,8 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
                       cursor: "pointer",
                       padding: "6px 12px",
                       borderRadius: 6,
-                      background: correctLabel === lbl ? "var(--success-bg)" : "var(--canvas)",
-                      color: correctLabel === lbl ? "var(--success)" : "var(--muted)",
+                      background: correctLabel === lbl ? "var(--success-bg)" : "var(--bg-surface-secondary)",
+                      color: correctLabel === lbl ? "var(--success)" : "var(--text-muted)",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -193,7 +195,7 @@ export function QuestionForm({ examId, nextPosition }: QuestionFormProps) {
                   </label>
                 ) : (
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--navy-800)" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--brand-accent)" }}>
                       Nilai (1–5):
                     </span>
                     <input

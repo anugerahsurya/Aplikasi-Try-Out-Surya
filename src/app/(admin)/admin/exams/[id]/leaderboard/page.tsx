@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import { Exam } from "@/types";
 import { ResetAttemptButton } from "@/components/admin/ResetAttemptButton";
+import { SendSolutionsModal } from "@/components/admin/SendSolutionsModal";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function AdminExamLeaderboardPage({
   params,
@@ -60,18 +64,27 @@ export default async function AdminExamLeaderboardPage({
 
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-      {/* Header Breadcrumbs */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      {/* Top Navigation */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <Link
           href="/admin/exams"
           className="btn btn-ghost btn-sm"
           style={{ paddingLeft: 0 }}
         >
-          <ArrowLeft size={16} /> Kembali ke Bank Soal
+          <ArrowLeft size={16} /> Kembali ke Daftar Ujian
         </Link>
 
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <SendSolutionsModal
+            examId={exam.id}
+            examTitle={exam.title}
+            examSlug={exam.slug}
+            hasMasterPdf={Boolean((exam as any).explanation_pdf)}
+            eligibleCount={totalFinished}
+            buttonVariant="secondary"
+            buttonSize="sm"
+          />
           <Link
             href={`/admin/exams/${exam.id}/questions`}
             className="btn btn-outline btn-sm"

@@ -16,6 +16,10 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { AutoExitFullscreen } from "@/components/exam/AutoExitFullscreen";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ParticipantDashboard() {
   const supabase = await createClient();
@@ -28,20 +32,15 @@ export default async function ParticipantDashboard() {
     redirect("/login");
   }
 
-  // Fetch profile
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  // Parallel data fetching
+  // Fetch profile and assignments/exams in parallel
   const [
+    { data: profile },
     { data: activeAttempt },
     { data: assignments },
     { data: publishedExams },
     { data: completedAttempts },
   ] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase
       .from("attempts")
       .select("*, exam:exams(*)")
@@ -81,13 +80,13 @@ export default async function ParticipantDashboard() {
     const validScores = completedAttempts.filter((a: any) => typeof a.score === "number");
     if (validScores.length > 0) {
       const avgScore = validScores.reduce((acc: number, curr: any) => acc + (curr.score || 0), 0) / validScores.length;
-      // Normalized rate (0 - 100%)
-      estimatedProbability = Math.min(100, Math.max(0, Math.round(avgScore > 100 ? (avgScore / 500) * 100 : avgScore)));
+      estimatedProbability = Math.min(100, Math.max(10, Math.round((avgScore / 500) * 100)));
     }
   }
 
   return (
-    <div style={{ maxWidth: 980, margin: "0 auto" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <AutoExitFullscreen />
         {/* Warm Greeting Hero */}
         <section
           className="stat-card-crafted"
@@ -131,31 +130,46 @@ export default async function ParticipantDashboard() {
                   border: "1px solid var(--border-color)",
                   boxShadow: "var(--card-shadow-sm)",
                   display: "flex",
-                  alignItems: "center",
-                  gap: 10,
+                  flexDirection: "column",
+                  gap: 8,
+                  minWidth: 170,
                 }}
               >
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 10,
-                    background: completedCount > 0 ? "rgba(16, 185, 129, 0.12)" : "rgba(100, 116, 139, 0.12)",
-                    color: completedCount > 0 ? "var(--success)" : "var(--text-muted)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <TrendingUp size={20} />
-                </div>
-                <div>
-                  <span className="muted" style={{ fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase" }}>
-                    Passing Probability
-                  </span>
-                  <div style={{ fontSize: "1.2rem", fontWeight: 800, color: completedCount > 0 ? "var(--success)" : "var(--text-muted)" }}>
-                    {completedCount > 0 ? `${estimatedProbability}%` : "0%"}
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: completedCount > 0 ? "rgba(16, 185, 129, 0.12)" : "rgba(100, 116, 139, 0.12)",
+                      color: completedCount > 0 ? "var(--success)" : "var(--text-muted)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <TrendingUp size={20} />
                   </div>
+                  <div>
+                    <span className="muted" style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Peluang Lolos
+                    </span>
+                    <div style={{ fontSize: "1.2rem", fontWeight: 800, color: completedCount > 0 ? "var(--success)" : "var(--text-muted)" }}>
+                      {completedCount > 0 ? `${estimatedProbability}%` : "0%"}
+                    </div>
+                  </div>
+                </div>
+                {/* Visual Progress Bar */}
+                <div style={{ width: "100%", height: 6, background: "var(--bg-surface-secondary)", borderRadius: 99, overflow: "hidden" }}>
+                  <div
+                    style={{
+                      width: `${completedCount > 0 ? Math.min(100, estimatedProbability) : 0}%`,
+                      height: "100%",
+                      background: completedCount > 0 ? "linear-gradient(90deg, #10b981, #059669)" : "transparent",
+                      borderRadius: 99,
+                      transition: "width 0.5s ease",
+                    }}
+                  />
                 </div>
               </div>
 

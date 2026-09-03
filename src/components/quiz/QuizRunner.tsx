@@ -60,17 +60,43 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasEnteredFullscreen, setHasEnteredFullscreen] = useState(false);
   const hasEnteredFullscreenRef = useRef(false);
+  const [isWindowBlurred, setIsWindowBlurred] = useState(false);
+  const isWindowBlurredRef = useRef(false);
   const [violationCount, setViolationCount] = useState(0);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [securityToast, setSecurityToast] = useState<string | null>(null);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showMobilePalette, setShowMobilePalette] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [paletteFilter, setPaletteFilter] = useState<"all" | "flagged" | "unanswered">("all");
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isSubmittingRef = useRef(false);
   const securityToastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const exitFullscreenSafely = useCallback(() => {
+    try {
+      if (
+        typeof document !== "undefined" &&
+        (document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement)
+      ) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if ((document as any).webkitExitFullscreen) {
+          (document as any).webkitExitFullscreen();
+        } else if ((document as any).mozCancelFullScreen) {
+          (document as any).mozCancelFullScreen();
+        } else if ((document as any).msExitFullscreen) {
+          (document as any).msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn("exitFullscreen error:", err);
+    }
+  }, []);
 
   const showSecurityToast = useCallback((msg: string) => {
     if (securityToastTimerRef.current) clearTimeout(securityToastTimerRef.current);
@@ -224,6 +250,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
       const data = await res.json();
       if (res.ok) {
         await clearOutboxForAttempt(attemptId);
+        exitFullscreenSafely();
         router.replace(data.redirect_url || `/results/${attemptId}`);
       } else {
         alert(`Gagal mengirim ujian: ${data.error || "Silakan coba lagi."}`);
@@ -295,6 +322,27 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     [attemptId, policy, executeSubmit]
   );
 
+  const triggerScreenshotViolation = useCallback(
+    (triggerSource: string) => {
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText("Aktivitas tangkapan layar dilarang demi keamanan ujian.").catch(() => {});
+        }
+      } catch {}
+
+      showSecurityToast("⚠️ Tangkapan layar dilarang keras selama ujian!");
+      setWarningMessage(
+        "⚠️ Terdeteksi aktivitas tangkapan layar (Screenshot / Snipping Tool). Tindakan ini dilarang keras demi integritas ujian dan telah dicatat sebagai pelanggaran keamanan!"
+      );
+      setViolationCount((prev) => prev + 1);
+      logSecurityEvent("screenshot_attempt", {
+        trigger: triggerSource,
+        is_mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      });
+    },
+    [logSecurityEvent, showSecurityToast]
+  );
+
   // Anti-Cheating Listeners (Desktop & Mobile Smartphone)
   useEffect(() => {
     // Add anti-selection and anti-touch-callout classes to html & body
@@ -323,6 +371,8 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
+        setIsWindowBlurred(true);
+        isWindowBlurredRef.current = true;
         logSecurityEvent("tab_hidden", {
           reason: "Pindah tab atau meminimalkan browser",
           is_mobile: isMobileDevice(),
@@ -332,11 +382,30 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     };
 
     const handleWindowBlur = () => {
+      setIsWindowBlurred(true);
+      isWindowBlurredRef.current = true;
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText("Aktivitas tangkapan layar dilarang.").catch(() => {});
+        }
+      } catch {}
+
       if (policy.log_focus_loss) {
         logSecurityEvent("window_blur", {
-          reason: "Jendela browser kehilangan fokus",
+          reason: "Jendela browser kehilangan fokus (kemungkinan screenshot / ganti aplikasi)",
           is_mobile: isMobileDevice(),
         });
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (isWindowBlurredRef.current) {
+        setIsWindowBlurred(false);
+        isWindowBlurredRef.current = false;
+        setWarningMessage(
+          "⚠️ Jendela ujian terdeteksi kehilangan fokus atau membuka alat screenshot/aplikasi lain. Pelanggaran telah dicatat!"
+        );
+        setViolationCount((prev) => prev + 1);
       }
     };
 
@@ -451,7 +520,27 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent common shortcuts: Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+P, Ctrl+U, Ctrl+S, Ctrl+A, F12, PrintScreen
+      // 1. Intercept PrintScreen
+      if (e.key === "PrintScreen" || e.code === "PrintScreen" || e.keyCode === 44) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerScreenshotViolation("Tombol PrintScreen (KeyDown)");
+        return;
+      }
+
+      // 2. Intercept Snipping Tool shortcuts: Win+Shift+S, Ctrl+Shift+S, Meta+Shift+S, Mac Cmd+Shift+3/4/5
+      if (
+        ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key.toLowerCase() === "s" || e.code === "KeyS")) ||
+        (e.metaKey && e.shiftKey && ["3", "4", "5"].includes(e.key)) ||
+        (e.altKey && (e.key === "PrintScreen" || e.code === "PrintScreen"))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerScreenshotViolation("Pintasan Screenshot (Win/Cmd+Shift+S)");
+        return;
+      }
+
+      // 3. Prevent clipboard shortcuts
       if (
         policy.disable_clipboard &&
         (e.ctrlKey || e.metaKey) &&
@@ -466,9 +555,13 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
         showSecurityToast("⚠️ Akses DevTools dilarang.");
         logSecurityEvent("dev_tools_attempt", { is_mobile: isMobileDevice() });
       }
-      if (e.key === "PrintScreen") {
-        showSecurityToast("⚠️ Tangkapan layar dilarang.");
-        logSecurityEvent("print_screen_attempt", { is_mobile: isMobileDevice() });
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "PrintScreen" || e.code === "PrintScreen" || e.keyCode === 44) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerScreenshotViolation("Tombol PrintScreen (KeyUp)");
       }
     };
 
@@ -485,6 +578,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
     document.addEventListener("contextmenu", handleContextMenu);
@@ -497,11 +591,13 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     document.addEventListener("touchstart", handleTouchStart, { passive: true });
     document.addEventListener("touchmove", handleTouchMove, { passive: true });
     document.addEventListener("touchend", handleTouchEnd, { passive: true });
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("keyup", handleKeyUp, true);
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
     return () => {
+      exitFullscreenSafely();
       document.documentElement.classList.remove("quiz-secure-lock");
       document.body.classList.remove("quiz-secure-lock");
       if (touchHoldTimer) clearTimeout(touchHoldTimer);
@@ -509,6 +605,7 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
 
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
       document.removeEventListener("contextmenu", handleContextMenu);
@@ -521,11 +618,12 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, true);
+      window.removeEventListener("keyup", handleKeyUp, true);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [policy, logSecurityEvent, flushOutbox, showSecurityToast]);
+  }, [policy, logSecurityEvent, flushOutbox, showSecurityToast, triggerScreenshotViolation, exitFullscreenSafely]);
 
   const enterFullscreen = async () => {
     try {
@@ -573,10 +671,81 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
     }
   };
 
-  // -------------------------------------------------------------
-  // 5. Calculations for Palette
-  // -------------------------------------------------------------
   const totalQuestions = initialData.questions.length;
+
+  // -------------------------------------------------------------
+  // 5. Ergonomic Keyboard Shortcuts (A-E for options, R for ragu, Arrows)
+  // -------------------------------------------------------------
+  useEffect(() => {
+    const handleQuizKeyboard = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input/textarea or if modal is active
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable ||
+        showSubmitModal ||
+        showMobilePalette ||
+        warningMessage ||
+        isWindowBlurred
+      ) {
+        return;
+      }
+
+      // Ignore if modifier keys are pressed
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const key = e.key.toUpperCase();
+
+      // Navigation: Left arrow = previous, Right arrow = next
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setCurrentIndex((prev) => Math.max(0, prev - 1));
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setCurrentIndex((prev) => Math.min(totalQuestions - 1, prev + 1));
+        return;
+      }
+
+      // Flag: 'R' key
+      if (key === "R") {
+        e.preventDefault();
+        handleToggleFlag();
+        return;
+      }
+
+      // Option selection: 'A', 'B', 'C', 'D', 'E'
+      if (["A", "B", "C", "D", "E"].includes(key) && currentQuestion?.options) {
+        const matchingOpt = currentQuestion.options.find(
+          (opt) => opt.label.toUpperCase() === key
+        );
+        if (matchingOpt) {
+          e.preventDefault();
+          handleSelectOption(matchingOpt.id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleQuizKeyboard);
+    return () => {
+      window.removeEventListener("keydown", handleQuizKeyboard);
+    };
+  }, [
+    currentQuestion,
+    totalQuestions,
+    showSubmitModal,
+    showMobilePalette,
+    warningMessage,
+    isWindowBlurred,
+    handleSelectOption,
+    handleToggleFlag,
+  ]);
+
+  // -------------------------------------------------------------
+  // 6. Calculations for Palette
+  // -------------------------------------------------------------
   let answeredCount = 0;
   let flaggedCount = 0;
 
@@ -706,6 +875,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                       Poin 1-5
                     </span>
                   )}
+                  <span className="kbd-hint desktop-inline" title="Pintasan keyboard: tekan A-E untuk memilih opsi, R untuk ragu-ragu, dan panah ← → untuk pindah soal">
+                    ⌨️ A–E / R / ← →
+                  </span>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -758,7 +930,16 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                   return (
                     <div
                       key={opt.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
                       onClick={() => handleSelectOption(opt.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleSelectOption(opt.id);
+                        }
+                      }}
                       className={`option-item ${isSelected ? "selected" : ""}`}
                     >
                       <span className="option-letter">{opt.label}</span>
@@ -825,21 +1006,69 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
               Daftar Nomor Soal
             </h3>
 
-            {/* Summary Counters */}
+            {/* Summary Counters with Interactive Quick Filters */}
             <div className="palette-summary-box">
-              <div>
+              <div
+                onClick={() => setPaletteFilter("all")}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  transition: "all 0.15s ease",
+                  outline: paletteFilter === "all" ? "2px solid var(--border-focus)" : "none",
+                }}
+                title="Tampilkan Semua Soal"
+              >
                 <span className="palette-stat-number answered">{answeredCount}</span>
                 <span className="palette-stat-label">Dijawab</span>
               </div>
-              <div>
+              <div
+                onClick={() => setPaletteFilter((prev) => (prev === "flagged" ? "all" : "flagged"))}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  transition: "all 0.15s ease",
+                  outline: paletteFilter === "flagged" ? "2px solid var(--warning)" : "none",
+                  background: paletteFilter === "flagged" ? "var(--warning-bg)" : "transparent",
+                }}
+                title="Klik untuk filter: Hanya Soal Ragu-ragu"
+              >
                 <span className="palette-stat-number flagged">{flaggedCount}</span>
                 <span className="palette-stat-label">Ragu</span>
               </div>
-              <div>
+              <div
+                onClick={() => setPaletteFilter((prev) => (prev === "unanswered" ? "all" : "unanswered"))}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  transition: "all 0.15s ease",
+                  outline: paletteFilter === "unanswered" ? "2px solid var(--danger)" : "none",
+                  background: paletteFilter === "unanswered" ? "var(--danger-bg)" : "transparent",
+                }}
+                title="Klik untuk filter: Hanya Soal Kosong"
+              >
                 <span className="palette-stat-number unanswered">{unansweredCount}</span>
                 <span className="palette-stat-label">Kosong</span>
               </div>
             </div>
+
+            {paletteFilter !== "all" && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "6px 0 10px", fontSize: "0.78rem" }}>
+                <span className="badge badge-warning" style={{ fontSize: "0.72rem" }}>
+                  Filter: {paletteFilter === "flagged" ? "Ragu-ragu" : "Belum Dijawab"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPaletteFilter("all")}
+                  className="btn btn-ghost btn-sm"
+                  style={{ padding: "2px 6px", fontSize: "0.72rem" }}
+                >
+                  Semua
+                </button>
+              </div>
+            )}
 
             {/* Palette Buttons Grid */}
             <div className="palette-grid">
@@ -848,6 +1077,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 const isCurrent = idx === currentIndex;
                 const isAnswered = Boolean(ans?.selectedOptionId);
                 const isFlagged = Boolean(ans?.isFlagged);
+
+                if (paletteFilter === "flagged" && !isFlagged) return null;
+                if (paletteFilter === "unanswered" && isAnswered) return null;
 
                 let className = "palette-btn";
                 if (isAnswered) className += " answered";
@@ -909,20 +1141,62 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
             </div>
 
             {/* Summary Counters */}
-            <div className="palette-summary-box" style={{ margin: "10px 16px 14px" }}>
-              <div>
+            <div className="palette-summary-box" style={{ margin: "10px 16px 10px" }}>
+              <div
+                onClick={() => setPaletteFilter("all")}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  outline: paletteFilter === "all" ? "2px solid var(--border-focus)" : "none",
+                }}
+              >
                 <span className="palette-stat-number answered">{answeredCount}</span>
                 <span className="palette-stat-label">Dijawab</span>
               </div>
-              <div>
+              <div
+                onClick={() => setPaletteFilter((prev) => (prev === "flagged" ? "all" : "flagged"))}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  outline: paletteFilter === "flagged" ? "2px solid var(--warning)" : "none",
+                  background: paletteFilter === "flagged" ? "var(--warning-bg)" : "transparent",
+                }}
+              >
                 <span className="palette-stat-number flagged">{flaggedCount}</span>
                 <span className="palette-stat-label">Ragu</span>
               </div>
-              <div>
+              <div
+                onClick={() => setPaletteFilter((prev) => (prev === "unanswered" ? "all" : "unanswered"))}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "4px 2px",
+                  outline: paletteFilter === "unanswered" ? "2px solid var(--danger)" : "none",
+                  background: paletteFilter === "unanswered" ? "var(--danger-bg)" : "transparent",
+                }}
+              >
                 <span className="palette-stat-number unanswered">{unansweredCount}</span>
                 <span className="palette-stat-label">Kosong</span>
               </div>
             </div>
+
+            {paletteFilter !== "all" && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "0 16px 10px", fontSize: "0.78rem" }}>
+                <span className="badge badge-warning" style={{ fontSize: "0.72rem" }}>
+                  Filter: {paletteFilter === "flagged" ? "Ragu-ragu" : "Belum Dijawab"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPaletteFilter("all")}
+                  className="btn btn-ghost btn-sm"
+                  style={{ padding: "2px 6px", fontSize: "0.72rem" }}
+                >
+                  Semua
+                </button>
+              </div>
+            )}
 
             {/* Mobile Numbers Grid */}
             <div className="quiz-drawer-grid-container">
@@ -932,6 +1206,9 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                   const isCurrent = idx === currentIndex;
                   const isAnswered = Boolean(ans?.selectedOptionId);
                   const isFlagged = Boolean(ans?.isFlagged);
+
+                  if (paletteFilter === "flagged" && !isFlagged) return null;
+                  if (paletteFilter === "unanswered" && isAnswered) return null;
 
                   let className = "palette-btn";
                   if (isAnswered) className += " answered";
@@ -1008,6 +1285,33 @@ export function QuizRunner({ initialData }: QuizRunnerProps) {
                 <Maximize2 size={18} /> Masuk Fullscreen & Mulai Ujian
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screen Shield (Anti-Screenshot / Focus Loss Blur Overlay) */}
+      {isWindowBlurred && (
+        <div className="quiz-screen-shield">
+          <div className="quiz-screen-shield-card">
+            <ShieldAlert size={54} color="var(--danger)" style={{ marginBottom: 14 }} />
+            <h2 style={{ fontSize: "1.35rem", fontWeight: 800, margin: "0 0 10px", color: "#ffffff" }}>
+              Layar Ditutup Demi Keamanan Ujian
+            </h2>
+            <p style={{ fontSize: "0.92rem", color: "#cbd5e1", maxWidth: 420, lineHeight: 1.6, margin: "0 0 20px" }}>
+              Jendela ujian kehilangan fokus atau terdeteksi aktivitas tangkapan layar (screenshot / snipping tool). Klik tombol di bawah untuk kembali ke lembar ujian.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setIsWindowBlurred(false);
+                isWindowBlurredRef.current = false;
+                window.focus();
+              }}
+              className="btn btn-primary btn-lg"
+              style={{ fontWeight: 800 }}
+            >
+              Kembali ke Lembar Ujian
+            </button>
           </div>
         </div>
       )}

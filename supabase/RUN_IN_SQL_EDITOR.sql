@@ -440,3 +440,45 @@ ON public.announcements(is_active, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_question_options_position 
 ON public.question_options(question_id, position ASC);
 
+-- 8. PDF EXPLANATION STORAGE & ANTI-CHEAT SECURITY UPDATES
+ALTER TABLE public.exams 
+ADD COLUMN IF NOT EXISTS explanation_pdf text,
+ADD COLUMN IF NOT EXISTS explanation_pdf_generated_at timestamptz;
+
+CREATE OR REPLACE FUNCTION public.log_attempt_event(
+  p_attempt_id uuid,
+  p_event_type text,
+  p_metadata jsonb DEFAULT '{}'::jsonb
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT EXISTS(SELECT 1 FROM public.attempts WHERE id = p_attempt_id AND user_id = auth.uid()) THEN
+    RAISE EXCEPTION 'Attempt tidak ditemukan';
+  END IF;
+
+  INSERT INTO public.attempt_events(attempt_id, event_type, metadata)
+  VALUES(p_attempt_id, LEFT(p_event_type, 80), p_metadata);
+
+  IF p_event_type IN (
+    'tab_hidden',
+    'window_blur',
+    'fullscreen_exit',
+    'clipboard_attempt',
+    'print_screen_attempt',
+    'screenshot_attempt',
+    'dev_tools_attempt'
+  ) THEN
+    UPDATE public.attempts 
+    SET violation_count = violation_count + 1 
+    WHERE id = p_attempt_id;
+  END IF;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.log_attempt_event(uuid, text, jsonb) TO authenticated;
+
+

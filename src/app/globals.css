@@ -60,6 +60,16 @@
   --radius-lg: 15px;
   --radius-xl: 20px;
   --radius-pill: 9999px;
+
+  /* Harmonized Compatibility & Semantic Token Aliases */
+  --line: var(--border-color);
+  --navy-50: #eff6ff;
+  --navy-100: #dbeafe;
+  --navy-200: #bfdbfe;
+  --navy-600: #2563eb;
+  --navy-700: #1d4ed8;
+  --navy-800: #1e40af;
+  --navy-900: #1e3a8a;
 }
 
 /* Shimmer Skeleton Loaders */
@@ -131,15 +141,40 @@
   --card-shadow-hover: 0 24px 56px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(59, 130, 246, 0.35);
   --card-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.4);
   --button-shadow: 0 4px 18px rgba(59, 130, 246, 0.35);
+
+  /* Harmonized Compatibility & Semantic Token Aliases (Dark Mode) */
+  --line: var(--border-color);
+  --navy-50: rgba(59, 130, 246, 0.1);
+  --navy-100: rgba(59, 130, 246, 0.18);
+  --navy-200: rgba(59, 130, 246, 0.3);
+  --navy-600: #60a5fa;
+  --navy-700: #3b82f6;
+  --navy-800: #2563eb;
+  --navy-900: #93c5fd;
 }
 
 /* =========================================================
-   Base Resets & Typography
+   Base Resets, Accessibility & Typography
    ========================================================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* Focus Visible indicator for keyboard navigation (WCAG 2.2 AA) */
+*:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 html {
@@ -1567,3 +1602,129 @@ textarea.field {
     font-size: 0.84rem;
   }
 }
+
+/* ==========================================================================
+   Anti-Screenshot & Security Shield Overlay
+   ========================================================================== */
+.quiz-screen-shield {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  background: rgba(7, 22, 44, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  animation: fadeInShield 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInShield {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.quiz-screen-shield-card {
+  background: rgba(15, 23, 42, 0.96);
+  border: 2px solid var(--danger);
+  border-radius: 20px;
+  padding: 38px 32px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Filter Pills & Question Review Controls
+   ========================================================================== */
+.filter-pill-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.filter-pill:hover {
+  background: var(--bg-surface-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.filter-pill.active {
+  background: var(--brand-accent);
+  color: #ffffff;
+  border-color: var(--brand-accent);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
+}
+
+.filter-pill .pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.filter-pill.active .pill-count {
+  background: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+}
+
+/* Keyboard hint chip */
+.kbd-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Touch Target Safety (Minimum 44px on mobile) */
+@media (max-width: 768px) {
+  .btn,
+  .topbar-action-btn,
+  .bottom-nav-item,
+  .quiz-mobile-nav-pill {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+}
+
+
