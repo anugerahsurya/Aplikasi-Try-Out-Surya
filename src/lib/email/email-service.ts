@@ -12,15 +12,15 @@ export interface SmtpConfig {
 export function getSmtpConfig(): SmtpConfig | null {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = parseInt(process.env.SMTP_PORT || "465", 10);
-  const user = process.env.SMTP_USER || "";
-  const pass = process.env.SMTP_PASSWORD || "ciwh afam oyfq ahpk";
+  const user = (process.env.SMTP_USER || "").trim();
+  const pass = (process.env.SMTP_PASSWORD || "").trim();
   const secure = process.env.SMTP_SECURE === "true" || port === 465;
-  const from = process.env.SMTP_FROM || (user ? `NavyTryout <${user}>` : "NavyTryout <noreply@tryout.app>");
+  let from = process.env.SMTP_FROM || (user ? `NavyTryout <${user}>` : "NavyTryout <noreply@tryout.app>");
+  from = from.replace(/^["']|["']$/g, "").trim();
 
-  // If user or password is completely empty, it's not configured
-  if (!user && !process.env.SMTP_USER) {
-    // Check if we have pass and can deduce host
-    if (!pass) return null;
+  // User and password are strictly required
+  if (!user || !pass) {
+    return null;
   }
 
   return { host, port, secure, user, pass, from };
@@ -28,13 +28,13 @@ export function getSmtpConfig(): SmtpConfig | null {
 
 export function isSmtpConfigured(): boolean {
   const config = getSmtpConfig();
-  return Boolean(config && config.host && config.pass && (config.user || process.env.SMTP_USER));
+  return Boolean(config && config.host && config.user && config.pass);
 }
 
 export function createTransporter() {
   const config = getSmtpConfig();
   if (!config) {
-    throw new Error("SMTP configuration is incomplete");
+    throw new Error("Konfigurasi SMTP belum lengkap (SMTP_USER atau SMTP_PASSWORD belum diatur).");
   }
 
   return nodemailer.createTransport({

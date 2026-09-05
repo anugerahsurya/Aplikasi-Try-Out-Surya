@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -32,6 +32,29 @@ export function AppShell({ children, userEmail, userRole, userName }: AppShellPr
   const isInAdminSection = pathname.startsWith("/admin");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Presence Heartbeat: updates last_sign_in_at while user is active on the website
+  useEffect(() => {
+    if (!userEmail) return;
+
+    const sendHeartbeat = () => {
+      if (document.visibilityState === "visible") {
+        fetch("/api/user/heartbeat", { method: "POST" }).catch(() => {});
+      }
+    };
+
+    // Ping on mount & window focus
+    sendHeartbeat();
+    window.addEventListener("focus", sendHeartbeat);
+
+    // Periodic ping every 2.5 minutes (150,000 ms)
+    const interval = setInterval(sendHeartbeat, 150000);
+
+    return () => {
+      window.removeEventListener("focus", sendHeartbeat);
+      clearInterval(interval);
+    };
+  }, [userEmail]);
 
   const isExamActive = pathname.startsWith("/tryout/");
 

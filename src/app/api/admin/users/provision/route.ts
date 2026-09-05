@@ -60,18 +60,26 @@ export async function POST(request: NextRequest) {
       console.error("Profile upsert error:", profileError);
     }
 
-    let emailResult = { sent: false, error: "SMTP belum diatur" };
-    if (send_email && isSmtpConfigured()) {
-      const emailResp = await sendCredentialsEmail({
-        to: email,
-        fullName: full_name,
-        email,
-        temporaryPassword: tempPassword,
-      });
-      emailResult = {
-        sent: emailResp.success,
-        error: emailResp.error || "",
-      };
+    let emailResult = { sent: false, error: "Opsi kirim email tidak dicentang." };
+    if (send_email) {
+      if (isSmtpConfigured()) {
+        const emailResp = await sendCredentialsEmail({
+          to: email,
+          fullName: full_name,
+          email,
+          temporaryPassword: tempPassword,
+        });
+        emailResult = {
+          sent: emailResp.success,
+          error: emailResp.error || "",
+        };
+      } else {
+        emailResult = {
+          sent: false,
+          error:
+            "SMTP belum dikonfigurasi di server. Pastikan SMTP_USER dan SMTP_PASSWORD sudah diatur pada .env.local (lokal) atau Environment Variables (Vercel).",
+        };
+      }
     }
 
     return NextResponse.json({

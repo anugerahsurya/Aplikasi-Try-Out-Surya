@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   UserPlus,
   Mail,
@@ -12,6 +13,10 @@ import {
   Clock,
   Phone,
   Building,
+  Trash2,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { Profile, Exam } from "@/types";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -30,14 +35,19 @@ function formatLastOnline(lastSeen?: string | null): { text: string; isOnline: b
   const seenTime = new Date(lastSeen).getTime();
   const diffMs = now - seenTime;
 
-  // Online if within 1 hour (3,600,000 ms)
-  if (diffMs < 3600000 && diffMs >= 0) {
+  // Online if within 5 minutes (300,000 ms)
+  if (diffMs < 300000 && diffMs >= 0) {
     return { text: "Online", isOnline: true };
+  }
+
+  const diffMinutes = Math.floor(diffMs / 60000);
+  if (diffMinutes < 60) {
+    return { text: `${Math.max(1, diffMinutes)} mnt lalu`, isOnline: false };
   }
 
   const diffHours = Math.floor(diffMs / 3600000);
   if (diffHours < 24) {
-    return { text: `${Math.max(1, diffHours)} jam lalu`, isOnline: false };
+    return { text: `${diffHours} jam lalu`, isOnline: false };
   }
 
   const diffDays = Math.floor(diffHours / 24);
@@ -55,13 +65,24 @@ function formatLastOnline(lastSeen?: string | null): { text: string; isOnline: b
 }
 
 export function ParticipantManager({ participants, exams }: ParticipantManagerProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "participant" | "admin">("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState<Profile | null>(null);
   const [showBatchAssignModal, setShowBatchAssignModal] = useState(false);
   const [targetSendCreds, setTargetSendCreds] = useState<Profile | null>(null);
+  const [targetDeleteUser, setTargetDeleteUser] = useState<Profile | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTestingSmtp, setIsTestingSmtp] = useState(false);
+  const [smtpStatus, setSmtpStatus] = useState<{
+    configured: boolean;
+    connected?: boolean;
+    message?: string;
+    host?: string;
+    user?: string;
+  } | null>(null);
+
   const [createdUser, setCreatedUser] = useState<{
     id: string;
     email: string;
@@ -92,6 +113,31 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
     });
   }, [participants, searchQuery, roleFilter]);
 
+  // Handle Test SMTP Connection
+  const handleTestSmtp = async () => {
+    setIsTestingSmtp(true);
+    try {
+      const res = await fetch("/api/admin/smtp/status");
+      const data = await res.json();
+      setSmtpStatus(data);
+      if (data.connected) {
+        setActionMessage({
+          type: "success",
+          text: `Koneksi SMTP Berhasil: Siap mengirim email dari ${data.user || data.host}`,
+        });
+      } else {
+        setActionMessage({
+          type: "error",
+          text: `SMTP Belum Berfungsi: ${data.message || "Periksa file .env.local atau Vercel Environment Variables."}`,
+        });
+      }
+    } catch {
+      setActionMessage({ type: "error", text: "Gagal memeriksa status SMTP server." });
+    } finally {
+      setIsTestingSmtp(false);
+    }
+  };
+
   // Handle Add Participant Form Submit
   const handleAddParticipant = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,19 +164,54 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
       if (res.ok) {
         setCreatedUser(data.user);
         setShowAddModal(false);
-        setActionMessage({
-          type: "success",
-          text: `Akun untuk ${data.user.full_name} berhasil dibuat! ${
-            data.email_status?.sent
-              ? "Kredensial telah dikirim via email."
-              : "Salin password sementara di bawah jika belum terkirim via SMTP."
-          }`,
-        });
+        router.refresh();
+        if (data.email_status?.sent) {
+          setActionMessage({
+            type: "success",
+            text: `Akun untuk ${data.user.full_name} berhasil dibuat! Kredensial telah dikirim via email.`,
+          });
+        } else {
+          setActionMessage({
+            type: "error",
+            text: `Akun untuk ${data.user.full_name} berhasil dibuat, tetapi email tidak terkirim (${data.email_status?.error || "Cek pengaturan SMTP server"}). Silakan salin password sementara di bawah.`,
+          });
+        }
       } else {
         setActionMessage({ type: "error", text: data.error || "Gagal membuat peserta." });
       }
     } catch {
       setActionMessage({ type: "error", text: "Terjadi kesalahan jaringan." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Delete Participant
+  const handleConfirmDelete = async () => {
+    if (!targetDeleteUser) return;
+    setIsSubmitting(true);
+    setActionMessage(null);
+
+    try {
+      const res = await fetch(`/api/admin/users/${targetDeleteUser.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setActionMessage({
+          type: "success",
+          text: data.message || `Peserta ${targetDeleteUser.full_name} berhasil dihapus.`,
+        });
+        setTargetDeleteUser(null);
+        router.refresh();
+      } else {
+        setActionMessage({
+          type: "error",
+          text: data.error || "Gagal menghapus peserta.",
+        });
+      }
+    } catch {
+      setActionMessage({ type: "error", text: "Terjadi kesalahan koneksi saat menghapus peserta." });
     } finally {
       setIsSubmitting(false);
     }
@@ -280,6 +361,16 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={handleTestSmtp}
+            disabled={isTestingSmtp}
+            className="btn btn-outline"
+            title="Periksa koneksi SMTP dan kesiapan pengiriman email"
+          >
+            {isTestingSmtp ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={15} />}
+            {isTestingSmtp ? "Mengecek SMTP..." : "Tes SMTP"}
+          </button>
           {exams.length > 0 && (
             <button
               type="button"
@@ -454,7 +545,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
             {filteredParticipants.length > 0 ? (
               filteredParticipants.map((p) => {
                 const assignedExamsCount = p.assignments?.length || 0;
-                const onlineStatus = formatLastOnline(p.last_sign_in_at || (p as any).updated_at);
+                const onlineStatus = formatLastOnline(p.last_sign_in_at);
 
                 return (
                   <tr key={p.id}>
@@ -514,6 +605,19 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                         >
                           <Mail size={13} /> Kirim Kredensial
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setTargetDeleteUser(p)}
+                          disabled={isSubmitting}
+                          className="btn btn-outline btn-sm"
+                          title="Hapus akun peserta beserta seluruh riwayatnya"
+                          style={{
+                            color: "var(--danger, #ef4444)",
+                            borderColor: "rgba(239, 68, 68, 0.25)",
+                          }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -535,7 +639,7 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         {filteredParticipants.length > 0 ? (
           filteredParticipants.map((p) => {
             const assignedExamsCount = p.assignments?.length || 0;
-            const onlineStatus = formatLastOnline(p.last_sign_in_at || (p as any).updated_at);
+            const onlineStatus = formatLastOnline(p.last_sign_in_at);
 
             return (
               <div
@@ -612,8 +716,24 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
                       disabled={isSubmitting}
                       className="btn btn-outline btn-sm"
                       style={{ fontSize: "0.75rem", padding: "4px 8px" }}
+                      title="Kirim kredensial via SMTP"
                     >
                       <Mail size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTargetDeleteUser(p)}
+                      disabled={isSubmitting}
+                      className="btn btn-outline btn-sm"
+                      style={{
+                        fontSize: "0.75rem",
+                        padding: "4px 8px",
+                        color: "var(--danger, #ef4444)",
+                        borderColor: "rgba(239, 68, 68, 0.25)",
+                      }}
+                      title="Hapus peserta"
+                    >
+                      <Trash2 size={12} />
                     </button>
                   </div>
                 </div>
@@ -810,6 +930,19 @@ export function ParticipantManager({ participants, exams }: ParticipantManagerPr
         isLoading={isSubmitting}
         onConfirm={handleConfirmSendCredentials}
         onClose={() => setTargetSendCreds(null)}
+      />
+
+      {/* Interactive ConfirmDialog for Deleting Participant */}
+      <ConfirmDialog
+        isOpen={!!targetDeleteUser}
+        title="Hapus Akun Peserta?"
+        description={`Apakah Anda yakin ingin menghapus akun peserta "${targetDeleteUser?.full_name}" (${targetDeleteUser?.email})? PERINGATAN: Semua riwayat ujian, skor pengerjaan, log keamanan, dan penugasan peserta ini akan dihapus secara permanen dari sistem.`}
+        confirmText="Ya, Hapus Akun"
+        cancelText="Batal"
+        variant="danger"
+        isLoading={isSubmitting}
+        onConfirm={handleConfirmDelete}
+        onClose={() => !isSubmitting && setTargetDeleteUser(null)}
       />
     </div>
   );
